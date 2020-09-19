@@ -1,0 +1,21 @@
+{
+  "name": "recipes",
+  "version": "1.0.0",
+  "description": "Searchable recipes for Sara.",
+  "main": "main.js",
+  "scripts": {
+    "start": "set NODE_ENV=development&&electron ."
+  },
+  "author": "Bryce Frank",
+  "license": "ISC",
+  "devDependencies": {
+    "electron-reload": "^1.5.0",
+    "electron-reloader": "^1.0.1"
+  },
+  "dependencies": {
+    "electron": "^10.1.2",
+    "electron-json-storage": "^4.2.0",
+    "quill": "^1.3.7",
+    "spectre.css": "^0.5.9"
+  }
+}
