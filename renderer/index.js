@@ -2,12 +2,27 @@ var Quill = require('quill')
 const { ipcRenderer } = require('electron')
 
 document.getElementById('saveContentBtn').addEventListener('click', () => {
+  var title = document.getElementById('title').textContent;
+
   var outData = {
-    key: Date.now().toString(),
+    key: title.replace(/\s/g, ''),
+    title: title.trim(),
     delta: editor.getContents()
   }
-
   ipcRenderer.send('save-delta', outData)
+})
+
+ipcRenderer.on('recipe-titles', (event, titles) => {
+  const navbar = document.getElementById('navbar')
+
+  // Create html string
+  const titles_html = titles.reduce((html, title) => {
+    html += `<li class = 'recipe-title'>${title}</li>`
+    return html
+  }, '')
+
+  navbar.innerHTML = titles_html
+
 })
 
 var toolbarOptions = [

@@ -7,18 +7,24 @@
 </head>
 
 <body>
-  <div id="title" contenteditable="true">
-    <h1>test</h1>
+  <div id="navbar" class="w3-sidebar w3-bar-block" style="width:25%">
+    <p>navbar</p>
   </div>
 
-  <!-- Create the editor container -->
-  <div id="editor">
-  </div>
-  
-  <div id="saveContentBtn">
-    <button type="button">
-      Save
-    </button>
+  <div id="editorFrame" style="margin-left:25%">
+    <div id="title" contenteditable="true">
+      <h1>test</h1>
+    </div>
+
+    <!-- Create the editor container -->
+    <div id="editor">
+    </div>
+    
+    <div id="saveContentBtn">
+      <button type="button">
+        Save
+      </button>
+    </div>
   </div>
 
   <!-- Initialize Quill editor -->
