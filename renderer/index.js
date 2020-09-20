@@ -4,25 +4,25 @@ const { ipcRenderer } = require('electron')
 document.getElementById('saveContentBtn').addEventListener('click', () => {
   var title = document.getElementById('title').textContent;
 
-  var outData = {
+  // A recipe is an object containing the key, title and delta
+  var recipe = {
     key: title.replace(/\s/g, ''),
     title: title.trim(),
     delta: editor.getContents()
   }
-  ipcRenderer.send('save-delta', outData)
+  ipcRenderer.send('save-recipe', recipe)
 })
 
 ipcRenderer.on('recipe-titles', (event, titles) => {
   const navbar = document.getElementById('navbar')
 
-  // Create html string
+  //// Create html string
   const titles_html = titles.reduce((html, title) => {
     html += `<li class = 'recipe-title'>${title}</li>`
     return html
   }, '')
 
   navbar.innerHTML = titles_html
-
 })
 
 var toolbarOptions = [
