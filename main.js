@@ -6,9 +6,8 @@ const DataStore = require('./DataStore');
 const fs = require('fs');
 
 const dataName = 'RecipesMain'
-const recipesData = new DataStore({name: dataName})
+var recipesData = new DataStore({name: dataName})
 const dataPath = path.join(app.getPath('appData'), app.getName(), 'RecipesMain.JSON');
-console.log(dataPath)
 
 if (env === 'development') { 
     try { 
@@ -26,31 +25,48 @@ function main () {
   // Once the main window is displayed, send the list of recipes to
   // the renderer
   mainWindow.once('show', () => {
+    const titles = recipesData.getRecipes().parseTitles()
+    mainWindow.send('recipe-titles', titles)
   })
 
-
+  ipcMain.on('delete-recipe', (event, recipe) => {
+    
+  })
 
   ipcMain.on('save-recipe', (event, recipe) => {
-    const updatedRecipes = recipesData.addRecipe(recipe)
-    const titles = updatedRecipes.getRecipes().parseTitles()
+    recpiesdata = recipesData.addRecipe(recipe)
+    const titles = recipesData.getRecipes().parseTitles()
+
+    // Update the titles in the navbar
     mainWindow.send('recipe-titles', titles)
   });
+
+
+  ipcMain.on('load-recipe', (event, key) => {
+    // When a recipeis lodaed we render the delta in the editor,
+    // update the title bar, and highlight the selected recipe in the navbar
+    const recipe = recipesData.getRecipe(key)
+    mainWindow.send('render-delta', recipe['delta'])
+    mainWindow.send('update-title-bar', recipe['title'])
+    mainWindow.send('highlight-title', recipe['title'])
+  })
+
 }
 
 app.on('ready', main)
 
 app.on('window-all-closed', function () {
-  if (fs.existsSync(dataPath)) {
-      fs.unlink(dataPath, (err) => {
-          if (err) {
-              console.log(err);
-              return;
-          }
-          console.log("File succesfully deleted");
-      });
-  } else {
-      console.log("This file doesn't exist, cannot delete");
-  }
+  //if (fs.existsSync(dataPath)) {
+  //    fs.unlink(dataPath, (err) => {
+  //        if (err) {
+  //            console.log(err);
+  //            return;
+  //        }
+  //        console.log("File succesfully deleted");
+  //    });
+  //} else {
+  //    console.log("This file doesn't exist, cannot delete");
+  //}
 
   app.quit()
 })
