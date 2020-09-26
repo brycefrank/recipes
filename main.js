@@ -4,10 +4,15 @@ const env = process.env.NODE_ENV || 'development';
 const Window = require('./Window')
 const DataStore = require('./DataStore');
 const fs = require('fs');
+const SearchIndex = require('./SearchIndex');
 
+// Data storage
 const dataName = 'RecipesMain'
 var recipesData = new DataStore({name: dataName})
 const dataPath = path.join(app.getPath('appData'), app.getName(), 'RecipesMain.JSON');
+
+// Search engine
+const searchIndex = new SearchIndex(recipesData)
 
 if (env === 'development') { 
     try { 
