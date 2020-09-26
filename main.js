@@ -15,6 +15,12 @@ if (env === 'development') {
     } catch (_) { console.log(_); }     
 } 
 
+function selectRecipe(window, titles, recipe) {
+    window.send('update-titles', titles, recipe['title'])
+    window.send('render-delta', recipe['delta']) 
+    window.send('update-title-bar', recipe['title'])
+}
+
 function main () {
   let mainWindow = new Window({
     file: path.join('renderer', 'index.html')
@@ -26,29 +32,35 @@ function main () {
   // the renderer
   mainWindow.once('show', () => {
     const titles = recipesData.getRecipes().parseTitles()
-    mainWindow.send('recipe-titles', titles)
+    mainWindow.send('update-titles', titles)
   })
 
-  ipcMain.on('delete-recipe', (event, recipe) => {
-    
+  ipcMain.on('delete-recipe', (event, title) => {
+    recipesData = recipesData.deleteRecipe(title)    
+    const titles = recipesData.getRecipes().parseTitles()
+    mainWindow.send('update-titles', titles)
+
+    // Load the first recipe
+    const first_recipe = recipesData.recipes[0]
+    // FIXME what if there are no recipes?
+    selectRecipe(mainWindow, titles, first_recipe)
   })
 
   ipcMain.on('save-recipe', (event, recipe) => {
-    recpiesdata = recipesData.addRecipe(recipe)
+    recpiesData = recipesData.addRecipe(recipe)
     const titles = recipesData.getRecipes().parseTitles()
 
     // Update the titles in the navbar
-    mainWindow.send('recipe-titles', titles)
+    mainWindow.send('update-titles', titles)
   });
 
 
-  ipcMain.on('load-recipe', (event, key) => {
+  ipcMain.on('load-recipe', (event, title) => {
     // When a recipeis lodaed we render the delta in the editor,
     // update the title bar, and highlight the selected recipe in the navbar
-    const recipe = recipesData.getRecipe(key)
-    mainWindow.send('render-delta', recipe['delta'])
-    mainWindow.send('update-title-bar', recipe['title'])
-    mainWindow.send('highlight-title', recipe['title'])
+    const titles = recipesData.getRecipes().parseTitles()
+    const recipe = recipesData.getRecipe(title)
+    selectRecipe(mainWindow, titles, recipe)
   })
 
 }

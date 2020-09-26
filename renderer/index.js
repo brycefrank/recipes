@@ -3,10 +3,9 @@ const { ipcRenderer, ipcMain } = require('electron')
 
 const loadRecipe = (evt) => {
   const title = evt.target.textContent
-  const key =  title.replace(/\s/g, '')
 
   // Get the delta from main
-  ipcRenderer.send('load-recipe', key)
+  ipcRenderer.send('load-recipe', title)
 }
 
 document.getElementById('saveContentBtn').addEventListener('click', () => {
@@ -14,7 +13,6 @@ document.getElementById('saveContentBtn').addEventListener('click', () => {
 
   // A recipe is an object containing the key, title and delta
   var recipe = {
-    key: title.replace(/\s/g, ''),
     title: title.trim(),
     delta: editor.getContents()
   }
@@ -22,7 +20,8 @@ document.getElementById('saveContentBtn').addEventListener('click', () => {
 })
 
 document.getElementById('deleteContentBtn').addEventListener('click', () => {
-  ipcRenderer.send('delete-recipe', recipe)
+  const title = document.getElementById('title').textContent;
+  ipcRenderer.send('delete-recipe', title)
 })
 
 ipcRenderer.on('render-delta', (event, delta) => {
@@ -35,12 +34,16 @@ ipcRenderer.on('update-title-bar', (event, title) => {
   title_html.innerHTML = `<h1>${title}</h1>`
 })
 
-ipcRenderer.on('recipe-titles', (event, titles) => {
+ipcRenderer.on('update-titles', (event, titles, highlight_title) => {
   const navbar = document.getElementById('navbar-contents')
 
   // Create html string
   const titles_html = titles.reduce((html, title) => {
-    html += `<li class = 'recipe-title'>${title}</li>`
+    if(title == highlight_title) {
+      html += `<li class = 'recipe-title'><b>${title}</b></li>`
+    } else {
+      html += `<li class = 'recipe-title'>${title}</li>`
+    }
     return html
   }, '')
 
@@ -49,7 +52,6 @@ ipcRenderer.on('recipe-titles', (event, titles) => {
   navbar.querySelectorAll('.recipe-title').forEach(title => {
     title.addEventListener('click', loadRecipe)
   })
-
 })
 
 var toolbarOptions = [
