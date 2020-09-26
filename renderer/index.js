@@ -8,6 +8,14 @@ const loadRecipe = (evt) => {
   ipcRenderer.send('load-recipe', title)
 }
 
+// Event listener for text entry into search bar
+document.getElementById('search-input').addEventListener('input', (e) => {
+  const query = e.target.value
+  ipcRenderer.send('update-search', query)
+})
+
+
+// Save button
 document.getElementById('saveContentBtn').addEventListener('click', () => {
   var title = document.getElementById('title').textContent;
 
@@ -19,6 +27,7 @@ document.getElementById('saveContentBtn').addEventListener('click', () => {
   ipcRenderer.send('save-recipe', recipe)
 })
 
+// Delete button
 document.getElementById('deleteContentBtn').addEventListener('click', () => {
   const title = document.getElementById('title').textContent;
   ipcRenderer.send('delete-recipe', title)

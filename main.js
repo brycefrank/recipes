@@ -68,6 +68,20 @@ function main () {
     selectRecipe(mainWindow, titles, recipe)
   })
 
+  ipcMain.on('update-search', (event, query) => {
+    const result = searchIndex.index.search(query, {
+      expand: true
+    })
+
+    var matched_titles = []
+    result.forEach(res => {
+      // titles is listed is stored as 'ref' in the searchIndex
+      matched_titles.push(res['ref'])
+    })
+
+    mainWindow.send('update-titles', matched_titles)
+  })
+
 }
 
 app.on('ready', main)
