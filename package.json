@@ -14,6 +14,7 @@
     "electron-reloader": "^1.0.1"
   },
   "dependencies": {
+    "@yaireo/tagify": "^3.19.1",
     "elasticlunr": "^0.9.5",
     "electron": "^10.1.2",
     "electron-store": "^6.0.0",

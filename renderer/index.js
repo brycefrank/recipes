@@ -1,5 +1,11 @@
 var Quill = require('quill')
+var Tagify = require('@yaireo/tagify')
 const { ipcRenderer, ipcMain } = require('electron')
+
+
+// initialize Tagify
+var tagInput = document.querySelector('input[name=tags]');
+tagify = new Tagify(tagInput)
 
 const loadRecipe = (evt) => {
   const title = evt.target.textContent
@@ -10,18 +16,18 @@ const loadRecipe = (evt) => {
 
 // Event listener for text entry into search bar
 document.getElementById('search-input').addEventListener('input', (e) => {
-  const query = e.target.value
-  ipcRenderer.send('update-search', query)
+  const content = e.target.value
+  ipcRenderer.send('update-search', content)
 })
 
 
 // Save button
 document.getElementById('saveContentBtn').addEventListener('click', () => {
-  var title = document.getElementById('title').textContent;
+  var title = document.getElementById('title').textContent
 
-  // A recipe is an object containing the key, title and delta
   var recipe = {
     title: title.trim(),
+    tags: tagInput.value,
     delta: editor.getContents()
   }
   ipcRenderer.send('save-recipe', recipe)
@@ -36,6 +42,11 @@ document.getElementById('deleteContentBtn').addEventListener('click', () => {
 ipcRenderer.on('render-delta', (event, delta) => {
   // Render the delta
   editor.setContents(delta)
+})
+
+ipcRenderer.on('render-tags', (event, tags) => {
+  const tags_html = document.getElementById('tags')
+  tags_html.innerHTML = tags.join()
 })
 
 ipcRenderer.on('update-title-bar', (event, title) => {

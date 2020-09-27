@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Recpies</title>
   <link href="https://cdn.quilljs.com/1.0.0/quill.snow.css" rel="stylesheet">
+  <link rel="stylesheet" href="../node_modules/@yaireo/tagify/dist/tagify.css">
   <style>
     body {
       font-family: Helvetica, Arial, sans-serif
@@ -26,6 +27,11 @@
         height:400px;
     }
 
+    .tagify{    
+        width: 100%;
+        max-width: 700px;
+    }
+
   </style>
 </head>
 
@@ -43,6 +49,7 @@
     <div id="title" contenteditable="true">
       <h1>test</h1>
     </div>
+    <input name='tags' value='tag1, tag2' autofocus>
 
     <!-- Create the editor container -->
     <div id="editor">

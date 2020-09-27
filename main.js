@@ -21,9 +21,11 @@ if (env === 'development') {
 } 
 
 function selectRecipe(window, titles, recipe) {
-    window.send('update-titles', titles, recipe['title'])
-    window.send('render-delta', recipe['delta']) 
-    window.send('update-title-bar', recipe['title'])
+
+  window.send('update-titles', titles, recipe['title'])
+  window.send('render-delta', recipe['delta']) 
+  window.send('render-tags', recipe['tags']) 
+  window.send('update-title-bar', recipe['title'])
 }
 
 function main () {
@@ -56,7 +58,7 @@ function main () {
     const titles = recipesData.getRecipes().parseTitles()
 
     // Update the titles in the navbar
-    mainWindow.send('update-titles', titles)
+    mainWindow.send('update-titles', titles, recipe['title'])
   });
 
 
@@ -69,19 +71,22 @@ function main () {
   })
 
   ipcMain.on('update-search', (event, query) => {
-    const result = searchIndex.index.search(query, {
-      expand: true
-    })
+    if(query == '') {
+      // the content bar is blank, just send the main titles
+      const titles = recipesData.getRecipes().parseTitles()
+      mainWindow.send('update-titles', titles)
+    } else {
+      const result = searchIndex.index.search(query, { expand: true })
 
-    var matched_titles = []
-    result.forEach(res => {
-      // titles is listed is stored as 'ref' in the searchIndex
-      matched_titles.push(res['ref'])
-    })
-
-    mainWindow.send('update-titles', matched_titles)
+      var matched_titles = []
+      result.forEach(res => {
+        // titles is listed is stored as 'ref' in the searchIndex
+        matched_titles.push(res['ref'])
+      })
+      
+      mainWindow.send('update-titles', matched_titles)
+    }
   })
-
 }
 
 app.on('ready', main)
