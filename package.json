@@ -25,5 +25,5 @@
     "quill-delta-to-plaintext": "^1.0.0",
     "remote": "^0.2.6",
     "spectre.css": "^0.5.9"
-  }
+    }
 }

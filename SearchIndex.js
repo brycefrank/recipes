@@ -2,8 +2,6 @@ const elasticlunr = require('elasticlunr')
 const Delta = require('quill-delta')
 const toPlaintext = require('quill-delta-to-plaintext')
 
-console.log(toPlaintext)
-
 class SearchIndex {
   constructor(dataStore) {
     this.index = elasticlunr(function() {

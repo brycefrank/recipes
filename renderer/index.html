@@ -31,16 +31,27 @@
         width: 100%;
         max-width: 700px;
     }
+    
+    /* This prevents the tags from "jumping" on add*/
+    @keyframes tags--bump{
+        30% { transform: scale(1); }
+    }
 
   </style>
 </head>
 
 <body>
   <div id="navbar">
-    <div id="navbar-title"><h2>Recipes</h2></div>
+    <div id="navbar-title"><h2>Explorer</h2></div>
+    <div class="tab">
+      <button id="recipesBtn">Recipes</button>
+      <button id="tagsBtn">Tags</button>
+    </div>
+    <!--
     <div id="search-bar">
       <input type="text" id="search-input">
     </div>
+    -->
 
     <div id="navbar-contents"></div>
   </div>
@@ -67,7 +78,8 @@
     </div>
   </div>
 
-  <!-- Initialize Quill editor -->
+  <script src='./navbar.js'></script> 
+  <script src='./editor.js'></script> 
   <script src='./index.js'></script> 
 </body>
 

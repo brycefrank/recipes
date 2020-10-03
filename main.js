@@ -1,18 +1,34 @@
 const path = require('path')
-const { app, ipcMain } = require('electron')
+const { app, ipcMain, Menu, MenuItem } = require('electron')
 const env = process.env.NODE_ENV || 'development';
 const Window = require('./Window')
 const DataStore = require('./DataStore');
+const TagsStore = require('./TagsStore');
 const fs = require('fs');
 const SearchIndex = require('./SearchIndex');
 
-// Data storage
+// Recipe storage
 const dataName = 'RecipesMain'
 var recipesData = new DataStore({name: dataName})
 const dataPath = path.join(app.getPath('appData'), app.getName(), 'RecipesMain.JSON');
 
+// Tag storage
+const tagsName = 'TagsMain'
+var tagsData = new TagsStore({name: tagsName})
+const tagsPath = path.join(app.getPath('appData'), app.getName(), 'TagsMain.JSON');
+
 // Search engine
 const searchIndex = new SearchIndex(recipesData)
+
+//// Menu
+//const menu = new Menu()
+//menu.append(new MenuItem({
+//  label: 'Save',
+//  accelerator: 'CmdOrCtrl+S',
+//  click: () => {console.log('this')}
+//}))
+//
+//Menu.setApplicationMenu(menu)
 
 if (env === 'development') { 
     try { 
@@ -21,7 +37,6 @@ if (env === 'development') {
 } 
 
 function selectRecipe(window, titles, recipe) {
-
   window.send('update-titles', titles, recipe['title'])
   window.send('render-delta', recipe['delta']) 
   window.send('render-tags', recipe['tags']) 
@@ -39,7 +54,11 @@ function main () {
   // the renderer
   mainWindow.once('show', () => {
     const titles = recipesData.getRecipes().parseTitles()
-    mainWindow.send('update-titles', titles)
+
+    // TODO what if there are no recipes?
+    selectRecipe(mainWindow, titles, recipesData.recipes[1])
+
+    tagsData.organizeTags(recipesData.recipes)
   })
 
   ipcMain.on('delete-recipe', (event, title) => {
@@ -59,6 +78,9 @@ function main () {
 
     // Update the titles in the navbar
     mainWindow.send('update-titles', titles, recipe['title'])
+
+    // Update the tagsData
+    tagsData.updateTags(recipe)
   });
 
 
@@ -71,21 +93,21 @@ function main () {
   })
 
   ipcMain.on('update-search', (event, query) => {
-    if(query == '') {
+    //if(query == '') {
       // the content bar is blank, just send the main titles
       const titles = recipesData.getRecipes().parseTitles()
       mainWindow.send('update-titles', titles)
-    } else {
-      const result = searchIndex.index.search(query, { expand: true })
+    //} else {
+    //  const result = searchIndex.index.search(query, { expand: true })
 
-      var matched_titles = []
-      result.forEach(res => {
-        // titles is listed is stored as 'ref' in the searchIndex
-        matched_titles.push(res['ref'])
-      })
-      
-      mainWindow.send('update-titles', matched_titles)
-    }
+    //  var matched_titles = []
+    //  result.forEach(res => {
+    //    // titles is listed is stored as 'ref' in the searchIndex
+    //    matched_titles.push(res['ref'])
+    //  })
+    //  
+    //  mainWindow.send('update-titles', matched_titles)
+    //}
   })
 }
 
