@@ -111,8 +111,8 @@ function main () {
   })
 
 
-  ipcMain.on('update-tags-nav', (event) => {
-    console.log(tagsData.tags)
+  ipcMain.on('get-tags-nav', (event) => {
+    mainWindow.send('update-tags-nav', tagsData.tags)
   })
 
 }

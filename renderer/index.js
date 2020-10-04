@@ -1,5 +1,3 @@
-var Tagify = require('@yaireo/tagify')
-
 // initialize Tagify
 var tagInput = document.querySelector('input[name=tags]');
 tagify = new Tagify(tagInput)

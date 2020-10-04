@@ -51,7 +51,7 @@ class TagsStore extends Store {
     for(var i =0; i < rec_tags.length; i++) {
       const rec_tag_i = rec_tags[i]
       if (!Object.keys(this.tags).includes(rec_tag_i)) {
-        this.tags[rec_tag_i] = rec_title
+        this.tags[rec_tag_i] = [rec_title]
       }
     }
 
