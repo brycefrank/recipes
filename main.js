@@ -109,6 +109,12 @@ function main () {
     //  mainWindow.send('update-titles', matched_titles)
     //}
   })
+
+
+  ipcMain.on('update-tags-nav', (event) => {
+    console.log(tagsData.tags)
+  })
+
 }
 
 app.on('ready', main)

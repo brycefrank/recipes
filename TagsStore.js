@@ -25,7 +25,7 @@ class TagsStore extends Store {
       const rec_title = recipes[i]['title']
 
       for(var j = 0; j < rec_i_tags.length; j++) {
-        const tag_name = rec_i_tags[j]['value']
+        const tag_name = [rec_i_tags[j]['value']]
         this.addRecipe(rec_title, tag_name)
       }
     }
