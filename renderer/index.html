@@ -5,88 +5,36 @@
   <title>Recpies</title>
   <link href="https://cdn.quilljs.com/1.0.0/quill.snow.css" rel="stylesheet">
   <link rel="stylesheet" href="../node_modules/@yaireo/tagify/dist/tagify.css">
-  <style>
-    body {
-      font-family: Helvetica, Arial, sans-serif
-    }
-
-    li{
-      cursor: pointer
-    }
-
-    #navbar{
-        width: 185px;
-        float:left;
-        padding:5px;
-        height:100%;
-    }
-
-    #editorFrame{
-        padding:5px;
-        margin-left: 195px;
-        height:400px;
-    }
-
-    .tagify{    
-        width: 100%;
-    }
-
-    .nav-tag{
-      display: block
-    }
-
-    .ql-toolbar.ql-snow {
-      height: 75px;
-      max-height: 75px;
-    }
-
-    .recipeList {
-      display: none;
-    }
-    
-    /* This prevents the tags from "jumping" on add*/
-    @keyframes tags--bump{
-        30% { transform: scale(1); }
-    }
-
-  </style>
+  <link rel="stylesheet" href="./index.css">
 </head>
 
 <body>
-  <div id="navbar">
-    <div id="navbar-title"><h2>Explorer</h2></div>
+  <div id="navbar", class="split">
     <div class="tab">
-      <button id="recipesBtn">Recipes</button>
-      <button id="tagsBtn">Tags</button>
+      <button id="recipes-btn" class="navbar-button">Recipes</button>
+      <button id="tags-btn" class="navbar-button">Tags</button>
+      <button id="search-btn" class="navbar-button">Search</button>
     </div>
-    <!--
-    <div id="search-bar">
-      <input type="text" id="search-input">
-    </div>
-    -->
 
     <div id="navbar-contents"></div>
   </div>
 
-  <div id="editorFrame">
+  <div id="editor-frame", class="split">
     <div id="title" contenteditable="true">
       <h1>test</h1>
     </div>
-    <input name='tags' value='tag1, tag2' autofocus>
+    <input name="tags" value="tag1, tag2" autofocus>
 
     <!-- Create the editor container -->
-    <div id="editor">
-    </div>
-    
-    <div id="saveContentBtn">
-      <button type="button">
-        Save
-      </button>
-    </div>
-    <div id="deleteContentBtn">
-      <button type="button">
-        Delete
-      </button>
+    <div id="editor-space">
+      <div id="editor">
+      </div>
+
+      
+      <div class="tab" id="editor-buttons">
+        <button type="button" id="save-content-btn">Save</button>
+        <button type="button" id="delete-content-btn">Delete</button>
+      </div>
     </div>
   </div>
 

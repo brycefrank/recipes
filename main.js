@@ -1,5 +1,5 @@
 const path = require('path')
-const { app, ipcMain, Menu, MenuItem } = require('electron')
+const { app, dialog, ipcMain, Menu, MenuItem } = require('electron')
 const env = process.env.NODE_ENV || 'development';
 const Window = require('./Window')
 const DataStore = require('./DataStore');
@@ -62,14 +62,23 @@ function main () {
   })
 
   ipcMain.on('delete-recipe', (event, title) => {
-    recipesData = recipesData.deleteRecipe(title)    
-    const titles = recipesData.getRecipes().parseTitles()
-    mainWindow.send('update-titles', titles)
+    const options = {
+      buttons: ['Yes', 'No', 'Cancel'],
+      message: 'Do you really want to delete?'
+    }
 
-    // Load the first recipe
-    const first_recipe = recipesData.recipes[0]
-    // FIXME what if there are no recipes?
-    selectRecipe(mainWindow, titles, first_recipe)
+    dialog.showMessageBox(options).then((data) => {
+      if(data.response == 0) {
+        recipesData = recipesData.deleteRecipe(title)    
+        const titles = recipesData.getRecipes().parseTitles()
+        mainWindow.send('update-titles', titles)
+
+        // Load the first recipe
+        const first_recipe = recipesData.recipes[0]
+        // FIXME what if there are no recipes?
+        selectRecipe(mainWindow, titles, first_recipe)
+      }
+    })
   })
 
   ipcMain.on('save-recipe', (event, recipe) => {
@@ -81,6 +90,7 @@ function main () {
 
     // Update the tagsData
     tagsData.updateTags(recipe)
+
   });
 
 
@@ -92,22 +102,26 @@ function main () {
     selectRecipe(mainWindow, titles, recipe)
   })
 
+  ipcMain.on('get-recipe-titles', (event) => {
+    const titles = recipesData.getRecipes().parseTitles()
+    mainWindow.send('update-titles', titles)
+  })
+
   ipcMain.on('update-search', (event, query) => {
-    //if(query == '') {
+    if(query == '') {
       // the content bar is blank, just send the main titles
       const titles = recipesData.getRecipes().parseTitles()
       mainWindow.send('update-titles', titles)
-    //} else {
-    //  const result = searchIndex.index.search(query, { expand: true })
+    } else {
+      const result = searchIndex.index.search(query, { expand: true })
 
-    //  var matched_titles = []
-    //  result.forEach(res => {
-    //    // titles is listed is stored as 'ref' in the searchIndex
-    //    matched_titles.push(res['ref'])
-    //  })
-    //  
-    //  mainWindow.send('update-titles', matched_titles)
-    //}
+      var matched_titles = []
+      result.forEach(res => {
+        // titles is listed is stored as 'ref' in the searchIndex
+        matched_titles.push(res['ref'])
+      })
+      mainWindow.send('update-titles', matched_titles)
+    }
   })
 
 
