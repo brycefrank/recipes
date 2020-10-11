@@ -1,0 +1,87 @@
+body {
+  font-family: Helvetica, Arial, sans-serif
+}
+
+.recipe-title{
+  cursor: pointer;
+}
+
+body{
+  display: flex;
+  height: 100vh;
+  margin: 0px;
+}
+
+
+/* navbar */
+
+#navbar{
+  background-color: #ededed;
+}
+
+.tab {
+  display: flex;
+  justify-content: center;
+  margin-left: 6px;
+  margin-top: 6px;
+  margin-right: 6px;
+}
+
+.navbar-button{
+  flex: 0 0 33%;
+}
+
+.nav-tag{
+}
+
+#navbar-contents {
+  display: flex;
+  flex-direction: column;
+}
+
+.recipeList {
+  display: none;
+}
+
+.titles {
+  padding-left: 18px;
+  margin-top: 5px;
+}
+
+#search-bar {
+  margin-top: 5px
+}
+
+#editor-frame{
+  display: flex;
+  flex-direction: column;
+}
+
+#title > h1{
+  margin-left: 5px;
+  margin-top: 0px;
+  margin-block-end: 0px;
+}
+
+.gutter.gutter-horizontal {
+  cursor: ew-resize;
+}
+
+.tagify{    
+  width: 100%;
+  --tags-border-color: none;
+}
+
+#editor-space{
+  margin-left: 5px;
+}
+
+#editor-buttons{
+  justify-content: left;
+  margin-left: 0px;
+}
+
+/* This prevents the tags from "jumping" on add*/
+@keyframes tags--bump{
+    30% { transform: scale(1); }
+}
