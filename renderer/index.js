@@ -1,12 +1,7 @@
 // initialize Tagify
-const Split = require('split.js')
 var tagInput = document.querySelector('input[name=tags]');
 tagify = new Tagify(tagInput)
 
-// Initialize Split for the navbar and editor-frame
-Split(['#navbar', '#editor-frame'], {
-  sizes: [25, 75]
-})
 
 // Save button
 document.getElementById('save-content-btn').addEventListener('click', () => {

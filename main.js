@@ -36,8 +36,7 @@ if (env === 'development') {
     } catch (_) { console.log(_); }     
 } 
 
-function selectRecipe(window, titles, recipe) {
-  window.send('update-titles', titles, recipe['title'])
+function selectRecipe(window, recipe) {
   window.send('render-delta', recipe['delta']) 
   window.send('render-tags', recipe['tags']) 
   window.send('update-title-bar', recipe['title'])
@@ -56,8 +55,7 @@ function main () {
     const titles = recipesData.getRecipes().parseTitles()
 
     // TODO what if there are no recipes?
-    selectRecipe(mainWindow, titles, recipesData.recipes[1])
-
+    selectRecipe(mainWindow, recipesData.recipes[0])
     tagsData.organizeTags(recipesData.recipes)
   })
 
@@ -76,7 +74,7 @@ function main () {
         // Load the first recipe
         const first_recipe = recipesData.recipes[0]
         // FIXME what if there are no recipes?
-        selectRecipe(mainWindow, titles, first_recipe)
+        selectRecipe(mainWindow, first_recipe)
       }
     })
   })
@@ -99,7 +97,7 @@ function main () {
     // update the title bar, and highlight the selected recipe in the navbar
     const titles = recipesData.getRecipes().parseTitles()
     const recipe = recipesData.getRecipe(title)
-    selectRecipe(mainWindow, titles, recipe)
+    selectRecipe(mainWindow, recipe)
   })
 
   ipcMain.on('get-recipe-titles', (event) => {
@@ -127,6 +125,10 @@ function main () {
 
   ipcMain.on('get-tags-nav', (event) => {
     mainWindow.send('update-tags-nav', tagsData.tags)
+  })
+
+  ipcMain.on('get-tag-recipe-list', (event, tag) => {
+    mainWindow.send('tag-recipe-list', tagsData.tags[tag])
   })
 
 }
