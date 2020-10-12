@@ -24,5 +24,6 @@ var editor = new Quill('#editor', {
 	modules: {
 		toolbar: toolbarOptions
   },
-  theme: 'snow'
+  theme: 'snow',
+  scrollingContainer: '#editorcontainer'
 });

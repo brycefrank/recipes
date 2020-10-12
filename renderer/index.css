@@ -39,10 +39,6 @@ body{
   flex-direction: column;
 }
 
-.recipeList {
-  display: none;
-}
-
 .titles {
   padding-left: 18px;
   margin-top: 5px;
@@ -73,10 +69,20 @@ body{
 }
 
 #editor-space{
+  display: flex;
+  flex-direction: column;
   margin-left: 5px;
 }
 
+.ql-container.ql-snow {
+  flex: 1 1 auto;
+}
+.ql-editor {
+    overflow-y: scroll;
+}
+
 #editor-buttons{
+  flex: 0 1 40px;
   justify-content: left;
   margin-left: 0px;
 }

@@ -3,25 +3,11 @@ var Tagify = require('@yaireo/tagify')
 // Variable that tracks which 'tab' is loaded
 var loaded = 'recipes'
 
-const loadRecipe = (evt) => {
-  const title = evt.target.textContent
-  // Get the delta from main
-  ipcRenderer.send('load-recipe', title)
-
-  // "Dehighlight" any existing highlights
-  const recipe_titles = document.querySelectorAll('.recipe-title')
-  recipe_titles.forEach((el) => {
-    el.style.fontWeight='normal'
-  })
-
-  // Highlight (i.e. embolden) the recipe text in this element??
-  evt.target.style.fontWeight='bold'
-}
 
 
 const constructRecipeList = function(recipe_list) {
   const recipeList = document.createElement('ul')
-  recipeList.setAttribute('class', 'recipeList')
+  recipeList.setAttribute('class', 'titles')
 
   const recipe_list_html = recipe_list.reduce((html, recipe_title) => {
     html += `<li class = 'recipe-title'>${recipe_title}</li>`
@@ -61,10 +47,6 @@ const constructTags = function(tags) {
 
     const tagElm = constructTagElm(tag_title)
     tagContainer.appendChild(tagElm)
-
-    // Now we add the associated recipes
-    const recipeList = constructRecipeList(tags[tag_title])
-    tagContainer.appendChild(recipeList)
     navbar_contents.appendChild(tagContainer)
   }
 
