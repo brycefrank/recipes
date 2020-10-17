@@ -2,6 +2,15 @@
 var tagInput = document.querySelector('input[name=tags]');
 tagify = new Tagify(tagInput)
 
+const { Menu, MenuItem } = require('electron').remote;
+
+// Right click menu
+window.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  const menu = new Menu();
+  menu.append(new MenuItem(new MenuItem({label: 'test'})))
+  console.log(e.target.className)
+})
 
 // Save button
 document.getElementById('save-content-btn').addEventListener('click', () => {
@@ -13,7 +22,7 @@ document.getElementById('save-content-btn').addEventListener('click', () => {
     delta: editor.getContents()
   }
 
-  ipcRenderer.send('save-recipe', recipe)
+  ipcRenderer.send('save-recipe', recipe, loaded)
 })
 
 // Delete button
@@ -30,8 +39,10 @@ ipcRenderer.on('render-delta', (event, delta) => {
 ipcRenderer.on('render-tags', (event, tags) => {
   // Remove the tags
   tagify.removeAllTags()
-  tags = JSON.parse(tags)
-  tagify.addTags(tags)
+  if(tags.length > 0 ) {
+    tags = JSON.parse(tags)
+    tagify.addTags(tags)
+  }
 })
 
 ipcRenderer.on('update-title-bar', (event, title) => {

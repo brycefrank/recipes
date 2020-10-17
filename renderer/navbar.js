@@ -64,7 +64,6 @@ const constructTags = function(tags) {
 document.getElementById('recipes-btn').addEventListener('click', () => {
   // If the recipes are already loaded do nothing, otherwise render them.
   if(loaded != 'recipes') {
-    // FIXME this has an old name
     ipcRenderer.send('get-recipe-titles')
     const navbar = document.getElementById('navbar-contents')
     navbar.innerHTML = ''
@@ -105,7 +104,7 @@ ipcRenderer.on('update-tags-nav', (event, tags) => {
 
 ipcRenderer.on('update-titles', (event, titles) => {
   const navbar = document.getElementById('navbar-contents')
-  var titles_div = document.getElementById('titles')
+  var titles_div = navbar.getElementsByClassName('titles')[0]
 
   // If titles div does not exist, make it
   if(titles_div == null) {

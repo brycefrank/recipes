@@ -57,6 +57,14 @@ const handleTag = (evt) => {
   }
 }
 
+const deleteContextMenu = () => {
+    instance.destroy()
+    instance = Split(['#navbar', '#editor-frame'], {
+      sizes: [25, 75]
+    })
+    document.getElementById('tag-context').remove()
+}
+
 const constructContextMenu = (titles) => {
   var tagContext = document.getElementById('tag-context')
 
@@ -67,6 +75,18 @@ const constructContextMenu = (titles) => {
     // Otherwise clear its contents
     tagContext.innerHTML = ''
   }
+
+  // Create the top right button
+  const closeButton = document.createElement('div')
+  closeButton.setAttribute('id', 'close-tag-context-button')
+  closeButton.innerText = 'x'
+
+  closeButton.addEventListener('click', () => {
+    deleteContextMenu()
+  })
+
+  tagContext.appendChild(closeButton)
+
 
   // Create html string
   const recipeList = constructRecipeList(titles)
@@ -89,6 +109,7 @@ const constructContextMenu = (titles) => {
   instance = Split(['#navbar', '#tag-context', '#editor-frame'], {
     sizes: [25, 20, 60]
   })
+
 
   document.querySelectorAll('.recipe-title').forEach(title => {
     title.addEventListener('click', loadRecipe)

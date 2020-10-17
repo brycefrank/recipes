@@ -45,13 +45,10 @@ body{
 }
 
 #search-bar {
-  margin-top: 5px
+  margin: 0 auto;
+  margin-top: 5px;
 }
 
-#editor-frame{
-  display: flex;
-  flex-direction: column;
-}
 
 #title > h1{
   margin-left: 5px;
@@ -68,14 +65,34 @@ body{
   --tags-border-color: none;
 }
 
+
+#editor-frame{
+  display: flex;
+  flex-direction: column;
+}
+
+#editor-header{
+  flex: 0 1 auto;
+}
+
 #editor-space{
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
   margin-left: 5px;
 }
 
+#editor-footer{
+  flex: 0 1 auto;
+}
+
+.ql-toolbar.ql-snow{
+  flex: 0 1 auto;
+}
+
 .ql-container.ql-snow {
-  flex: 1 1 auto;
+  flex: 1 1 0;
+  min-height: 0px;
 }
 .ql-editor {
     overflow-y: scroll;
@@ -84,7 +101,13 @@ body{
 #editor-buttons{
   flex: 0 1 40px;
   justify-content: left;
-  margin-left: 0px;
+  margin-left: 5px;
+  margin-bottom: 5px;
+}
+
+#close-tag-context-button {
+  float: right;
+  cursor: pointer;
 }
 
 /* This prevents the tags from "jumping" on add*/

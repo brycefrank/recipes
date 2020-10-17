@@ -20,21 +20,27 @@
   </div>
 
   <div id="editor-frame", class="split">
-    <div id="title" contenteditable="true">
-      <h1>test</h1>
+    <div id = "editor-header">
+      <div id="title" contenteditable="true">
+        <h1>test</h1>
+      </div>
+      <input name="tags" value="tag1, tag2" autofocus>
     </div>
-    <input name="tags" value="tag1, tag2" autofocus>
 
     <!-- Create the editor container -->
     <div id="editor-space">
       <div id="editor"></div>
 
       
+    </div>
+
+    <div id="editor-footer">
       <div class="tab" id="editor-buttons">
         <button type="button" id="save-content-btn">Save</button>
         <button type="button" id="delete-content-btn">Delete</button>
       </div>
     </div>
+
   </div>
 
   <script src='./tagContext.js'></script> 

@@ -7,13 +7,14 @@ const defaultProps = {
   
   // update for electron V5+
   webPreferences: {
-    nodeIntegration: true
+    nodeIntegration: true,
+    enableRemoteModule: true
   }
 }
 
 class Window extends BrowserWindow {
   constructor ({ file, ...windowSettings }) {
-    // calls new BrowserWindow with these props
+    // calls new BrowserWindow with these props 
     super({ ...defaultProps, ...windowSettings })
 
     // load the html and open devtools

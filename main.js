@@ -20,15 +20,7 @@ const tagsPath = path.join(app.getPath('appData'), app.getName(), 'TagsMain.JSON
 // Search engine
 const searchIndex = new SearchIndex(recipesData)
 
-//// Menu
-//const menu = new Menu()
-//menu.append(new MenuItem({
-//  label: 'Save',
-//  accelerator: 'CmdOrCtrl+S',
-//  click: () => {console.log('this')}
-//}))
-//
-//Menu.setApplicationMenu(menu)
+// Context window
 
 if (env === 'development') { 
     try { 
@@ -55,6 +47,7 @@ function main () {
     const titles = recipesData.getRecipes().parseTitles()
 
     // TODO what if there are no recipes?
+    mainWindow.send('update-titles', titles)
     selectRecipe(mainWindow, recipesData.recipes[0])
     tagsData.organizeTags(recipesData.recipes)
   })
@@ -79,23 +72,22 @@ function main () {
     })
   })
 
-  ipcMain.on('save-recipe', (event, recipe) => {
+  ipcMain.on('save-recipe', (event, recipe, loaded) => {
     recpiesData = recipesData.addRecipe(recipe)
     const titles = recipesData.getRecipes().parseTitles()
 
-    // Update the titles in the navbar
-    mainWindow.send('update-titles', titles, recipe['title'])
+    if(loaded == 'recipes') {
+      mainWindow.send('update-titles', titles, recipe['title'])
+    }
 
     // Update the tagsData
     tagsData.updateTags(recipe)
-
   });
 
 
   ipcMain.on('load-recipe', (event, title) => {
     // When a recipeis lodaed we render the delta in the editor,
     // update the title bar, and highlight the selected recipe in the navbar
-    const titles = recipesData.getRecipes().parseTitles()
     const recipe = recipesData.getRecipe(title)
     selectRecipe(mainWindow, recipe)
   })
