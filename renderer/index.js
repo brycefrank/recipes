@@ -1,15 +1,39 @@
 // initialize Tagify
+const { remote } = require('electron');
+const { Menu, MenuItem } = remote;
+
+
+// Context menu for tags
+const addContextListener = (tag) => {
+  tag.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    const menu = new Menu();
+    const tagTitle = tag.children[1].children[0].innerText
+
+    menu.append(new MenuItem({
+      label: 'Category',
+      click: () => {ipcRenderer.send('set-tag-division', tagTitle, 'Category')}
+    }))
+
+    menu.append(new MenuItem({
+      label: 'Season',
+      click: () => {ipcRenderer.send('set-tag-division', tagTitle, 'Season')}
+    }))
+
+    menu.append(new MenuItem({
+      label: 'Source',
+      click: () => {ipcRenderer.send('set-tag-division', tagTitle, 'Source')}
+    }))
+
+    menu.popup({window: remote.getCurrentWindow()})
+  })
+}
+
 var tagInput = document.querySelector('input[name=tags]');
-tagify = new Tagify(tagInput)
-
-const { Menu, MenuItem } = require('electron').remote;
-
-// Right click menu
-window.addEventListener('contextmenu', (e) => {
-  e.preventDefault();
-  const menu = new Menu();
-  menu.append(new MenuItem(new MenuItem({label: 'test'})))
-  console.log(e.target.className)
+tagify = new Tagify(tagInput, {
+  callbacks: {
+    add: e => {addContextListener(e.detail.tag)}
+  }
 })
 
 // Save button

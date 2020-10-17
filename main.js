@@ -123,6 +123,13 @@ function main () {
     mainWindow.send('tag-recipe-list', tagsData.tags[tag])
   })
 
+  ipcMain.on('set-tag-division', (event, tagTitle, division) => {
+    // TODO we need to restructure the tag storage data structure
+    // it will take a lot of debugging to find the old references
+    // {'tag1': {'recipes' = [], 'division' = 'category'}}
+    console.log('this')
+  })
+
 }
 
 app.on('ready', main)
