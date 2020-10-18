@@ -3,13 +3,12 @@ var Tagify = require('@yaireo/tagify')
 // Variable that tracks which 'tab' is loaded
 var loaded = 'recipes'
 
-
-
+// TODO weird variable names here
 const constructRecipeList = function(recipe_list) {
   const recipeList = document.createElement('ul')
   recipeList.setAttribute('class', 'titles')
 
-  const recipe_list_html = recipe_list.reduce((html, recipe_title) => {
+  const recipe_list_html = recipe_list.recipes.reduce((html, recipe_title) => {
     html += `<li class = 'recipe-title'>${recipe_title}</li>`
     return html
   }, '')

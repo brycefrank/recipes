@@ -2,27 +2,56 @@
 const { remote } = require('electron');
 const { Menu, MenuItem } = remote;
 
+const parseTagDivision = (tagClassList) => {
+  var division = undefined
 
-// Context menu for tags
+  for(var i = 0; i < tagClassList.length; i++) {
+    if(tagClassList[i].startsWith('division')) {
+      division = tagClassList[i]     
+    }
+  }
+
+  return(division)
+}
+
+// sets the division (which is a class) of a tag DOM element
+// when the division is set bet the user
+const setDivision = (tag, division) => {
+  const newDivision = division
+  const classList  = tag.classList
+  const existingDivision = parseTagDivision(classList)
+
+  if(classList.length > 1)  {
+    if(existingDivision != newDivision) {
+      // replace the existing division class with the new one
+      tag.classList.replace(existingDivision, newDivision)
+    }
+  } else {
+    // division class is NOT set, add it
+    tag.classList.add(newDivision)
+  }
+}
+
+// Adds event listener to a tag in the tagify entry point
+// that allows setting the tag division
 const addContextListener = (tag) => {
   tag.addEventListener('contextmenu', (e) => {
     e.preventDefault();
     const menu = new Menu();
-    const tagTitle = tag.children[1].children[0].innerText
 
     menu.append(new MenuItem({
       label: 'Category',
-      click: () => {ipcRenderer.send('set-tag-division', tagTitle, 'Category')}
+      click: () => {setDivision(tag, 'division-category')}
     }))
 
     menu.append(new MenuItem({
       label: 'Season',
-      click: () => {ipcRenderer.send('set-tag-division', tagTitle, 'Season')}
+      click: () => {setDivision(tag, 'division-season')}
     }))
 
     menu.append(new MenuItem({
       label: 'Source',
-      click: () => {ipcRenderer.send('set-tag-division', tagTitle, 'Source')}
+      click: () => {setDivision(tag, 'division-source')}
     }))
 
     menu.popup({window: remote.getCurrentWindow()})
@@ -32,20 +61,39 @@ const addContextListener = (tag) => {
 var tagInput = document.querySelector('input[name=tags]');
 tagify = new Tagify(tagInput, {
   callbacks: {
-    add: e => {addContextListener(e.detail.tag)}
+    add: (e) => {
+      addContextListener(e.detail.tag)
+      setDivision(e.detail.tag, e.detail.data.division)
+    }
   }
 })
 
-// Save button
-document.getElementById('save-content-btn').addEventListener('click', () => {
-  var title = document.getElementById('title').textContent
+// This constructs the recipe object
+const parseTagInput = (recTitle) => {
+  const tagDOMs = document.getElementsByClassName('tagify')[0].getElementsByTagName('tag')
+
 
   var recipe = {
-    title: title.trim(),
-    tags: tagInput.value,
-    delta: editor.getContents()
+    'title': recTitle,
+    'tags': [],
+    'delta': editor.getContents()
   }
 
+  for(var i=0; i < tagDOMs.length; i++) {
+    const tag = tagDOMs[i]
+    var tagObj = {
+      'value': tag.getAttribute('title'),
+      'division': parseTagDivision(tag.classList)
+    }
+    recipe.tags.push(tagObj)
+  }
+  return(recipe)
+}
+
+// Save button
+document.getElementById('save-content-btn').addEventListener('click', () => {
+  const recTitle = document.getElementById('title').textContent
+  const recipe =  parseTagInput(recTitle)
   ipcRenderer.send('save-recipe', recipe, loaded)
 })
 
@@ -63,8 +111,9 @@ ipcRenderer.on('render-delta', (event, delta) => {
 ipcRenderer.on('render-tags', (event, tags) => {
   // Remove the tags
   tagify.removeAllTags()
+  
+  // Add the tags
   if(tags.length > 0 ) {
-    tags = JSON.parse(tags)
     tagify.addTags(tags)
   }
 })

@@ -28,9 +28,46 @@ if (env === 'development') {
     } catch (_) { console.log(_); }     
 } 
 
-function selectRecipe(window, recipe) {
+const sortTags = (recipe) => {
+  var tagSort = Array(2).fill(-1)
+  var nonDivIxs = []
+
+  for(const [ix, tag] of Object.entries(recipe['tags'])){
+    if(tag.division == 'division-source') {
+      tagSort[0] = ix
+    } else if (tag.division == 'division-season'){
+      tagSort[1] = ix
+    } else {
+      nonDivIxs.push(ix)
+    }
+  }
+
+  if(tagSort[0] == -1 && tagSort[1] != -1) {
+    tagSort[0] = tagSort[1]
+    tagSort[1] = -1
+    tagSort = [tagSort[0]]
+  } else if (tagSort[0] == -1 && tagSort[1] == -1) {
+    tagSort = []
+  }
+
+  // Push the remaining indices
+  nonDivIxs.forEach((ix) => (tagSort.push(ix)))
+
+  var recipeTags = []
+  tagSort.forEach((ix) => (recipeTags.push(recipe['tags'][ix])))
+
+  return(recipeTags)
+}
+
+function selectRecipe(window, recipe, sort_tags = true) {
+  var recipeTags = recipe['tags']
+
+  if(sort_tags) {
+    recipeTags = sortTags(recipe)
+  }
+
   window.send('render-delta', recipe['delta']) 
-  window.send('render-tags', recipe['tags']) 
+  window.send('render-tags', recipeTags) 
   window.send('update-title-bar', recipe['title'])
 }
 
@@ -49,7 +86,7 @@ function main () {
     // TODO what if there are no recipes?
     mainWindow.send('update-titles', titles)
     selectRecipe(mainWindow, recipesData.recipes[0])
-    tagsData.organizeTags(recipesData.recipes)
+    //tagsData.organizeTags(recipesData.recipes)
   })
 
   ipcMain.on('delete-recipe', (event, title) => {
@@ -123,11 +160,9 @@ function main () {
     mainWindow.send('tag-recipe-list', tagsData.tags[tag])
   })
 
-  ipcMain.on('set-tag-division', (event, tagTitle, division) => {
-    // TODO we need to restructure the tag storage data structure
-    // it will take a lot of debugging to find the old references
-    // {'tag1': {'recipes' = [], 'division' = 'category'}}
-    console.log('this')
+  ipcMain.on('set-tag-division', (event, tagName, division) => {
+    tagsData.setTagDivision(tagName, division)
+    mainWindow.send('update-tag-division')
   })
 
 }

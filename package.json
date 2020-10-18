@@ -18,6 +18,7 @@
     "electron-reloader": "^1.0.1"
   },
   "dependencies": {
+    "@yaireo/dragsort": "^1.0.8",
     "@yaireo/tagify": "^3.19.1",
     "elasticlunr": "^0.9.5",
     "electron-context-menu": "^2.3.0",

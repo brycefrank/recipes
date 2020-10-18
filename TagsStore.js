@@ -9,11 +9,11 @@ class TagsStore extends Store {
   saveTags () {
     // save tags to JSON file
     this.set('tags', this.tags)
-    return thisua
+    return this
   }
 
   getTaggedRecipes (tag) {
-    return this.tags[tag]
+    return this.tags[tag].recipes
   }
 
   organizeTags(recipes) {
@@ -24,73 +24,80 @@ class TagsStore extends Store {
     // FIXME if tags is empty, this crashes
     for(var i = 0; i < recipes.length; i++) {
       if(recipes[i]['tags'].length > 0) {
-        const rec_i_tags = JSON.parse(recipes[i]['tags'])
+        const rec_i_tags = recipes[i]['tags']
         const rec_title = recipes[i]['title']
 
         for(var j = 0; j < rec_i_tags.length; j++) {
           const tag_name = [rec_i_tags[j]['value']]
-          this.addRecipe(rec_title, tag_name)
+
+          // By default the tag division is 'Category'
+          this.addRecipe(rec_title, tag_name, 'Category')
         }
       }
     }
+
+    return this.saveTags()
+
   }
 
-  addRecipe(recipe_title, tag_name) {
+  addRecipe(recTitle, tagName) {
     // Add the recipe to the list only if it is not already there
-    const tag_list = this.tags[tag_name]
-    if(tag_list != undefined) {
-      if(!this.tags[tag_name].includes(recipe_title)) {
-        this.tags[tag_name].push(recipe_title)
+    if(this.tags[tagName] != undefined) {
+      if(!this.tags[tagName].recipes.includes(recTitle)) {
+        this.tags[tagName].recipes.push(recTitle)
       }
     } else {
-      this.tags[tag_name] = [recipe_title]
+      // Division is set to Category by default
+      this.tags[tagName] = {
+        'recipes' : [recTitle],
+        'division': 'Category'
+      }
     }
   }
 
+  setTagDivision(tagName, division) {
+    this.tags[tagName].division = division
+  }
+
+  // TODO this does nothing for the tag.divison
   updateTags(recipe) {
-    const rec_title = recipe['title']
+    const recTitle = recipe['title']
 
     if(recipe['tags'].length > 0) {
-      const rec_tags = JSON.parse(recipe['tags']).map((tag) => {return tag['value']})
+      const recTags = recipe['tags'].map((tag) => {return tag['value']})
 
       // First we want to add any missing tags
-      for(var i =0; i < rec_tags.length; i++) {
-        const rec_tag_i = rec_tags[i]
-        if (!Object.keys(this.tags).includes(rec_tag_i)) {
-          this.tags[rec_tag_i] = [rec_title]
+      for(var i=0; i < recTags.length; i++) {
+        const recTag_i = recTags[i]
+        if (!Object.keys(this.tags).includes(recTag_i)) {
+          this.addRecipe(recTitle, recTag_i)
         }
       }
 
       // Now we iterate over the currently indexed tags and update them
-      // by deleting removed tags or adding new tags from rec_tag_i
+      // by deleting removed tags or adding new tags from recTag_i
       for(const [ix_tag, ix_rec_list] of Object.entries(this.tags)) {
         // Does the rec_title belong to this tag currently? If it does
         // AND if the rec_tags indicate it SHOULDNT we should remove it.
-        if(this.tags[ix_tag].includes(rec_title)) {
+        if(this.tags[ix_tag].recipes.includes(recTitle)) {
 
-          if(!rec_tags.includes(ix_tag)) {
+          if(!recTags.includes(ix_tag)) {
             // we want to DELETE ourselves from this.tags[ix_tag]
-            this.tags[ix_tag] = this.tags[ix_tag].map((rec_title_i) => {if(rec_title_i != rec_title){
-              return(rec_title_i)
+            this.tags[ix_tag].recipes = this.tags[ix_tag].recipes.map((recTitle_i) => {
+              if(recTitle_i != recTitle) {
+              return(recTitle_i)
             }})
           }
         } else {
-          // Otherwise the rec_title does NOT beling to the tag currently. Check if 
+          // Otherwise the rec_title does NOT belong to the tag currently. Check if 
           // we should add it to thist.tags[ix_tag] (i.e. rec_tags contains ix_tag)
-          if(rec_tags.includes(ix_tag)) {
-            this.tags[ix_tag].push(rec_title)
+          if(recTags.includes(ix_tag)) {
+            this.tags[ix_tag].recipes.push(recTitle)
           }
         }
       }
-
     }
-
-
-
   }
-
-  //deleteRecipe (title) {
-  //}
 }
 
 module.exports = TagsStore
