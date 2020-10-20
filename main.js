@@ -42,6 +42,9 @@ const sortTags = (recipe) => {
     }
   }
 
+  // If the first element is -1, it implies we did not find
+  // a division-source, so the division-season becomes the first tag
+  // if both are -1, we didn't find either
   if(tagSort[0] == -1 && tagSort[1] != -1) {
     tagSort[0] = tagSort[1]
     tagSort[1] = -1
@@ -86,7 +89,7 @@ function main () {
     // TODO what if there are no recipes?
     mainWindow.send('update-titles', titles)
     selectRecipe(mainWindow, recipesData.recipes[0])
-    //tagsData.organizeTags(recipesData.recipes)
+    tagsData.organizeTags(recipesData.recipes)
   })
 
   ipcMain.on('delete-recipe', (event, title) => {
@@ -131,14 +134,14 @@ function main () {
 
   ipcMain.on('get-recipe-titles', (event) => {
     const titles = recipesData.getRecipes().parseTitles()
-    mainWindow.send('update-titles', titles)
+    mainWindow.send('display-recipe-list', titles)
   })
 
   ipcMain.on('update-search', (event, query) => {
     if(query == '') {
       // the content bar is blank, just send the main titles
       const titles = recipesData.getRecipes().parseTitles()
-      mainWindow.send('update-titles', titles)
+      mainWindow.send('display-recipe-list', titles)
     } else {
       const result = searchIndex.index.search(query, { expand: true })
 
@@ -147,13 +150,13 @@ function main () {
         // titles is listed is stored as 'ref' in the searchIndex
         matched_titles.push(res['ref'])
       })
-      mainWindow.send('update-titles', matched_titles)
+      mainWindow.send('display-recipe-list', matched_titles)
     }
   })
 
 
   ipcMain.on('get-tags-nav', (event) => {
-    mainWindow.send('update-tags-nav', tagsData.tags)
+    mainWindow.send('display-tags', tagsData.tags)
   })
 
   ipcMain.on('get-tag-recipe-list', (event, tag) => {

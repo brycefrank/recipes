@@ -17,7 +17,7 @@ const parseTagDivision = (tagClassList) => {
 // sets the division (which is a class) of a tag DOM element
 // when the division is set bet the user
 const setDivision = (tag, division) => {
-  const newDivision = division
+  var newDivision = division
   const classList  = tag.classList
   const existingDivision = parseTagDivision(classList)
 
@@ -27,7 +27,9 @@ const setDivision = (tag, division) => {
       tag.classList.replace(existingDivision, newDivision)
     }
   } else {
-    // division class is NOT set, add it
+    // division class is NOT set, add it, if its undefined, division-category
+    // is set as the default
+    if(newDivision==undefined){newDivision = 'division-category'}
     tag.classList.add(newDivision)
   }
 }

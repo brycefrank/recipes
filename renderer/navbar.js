@@ -1,25 +1,124 @@
+const { ipcRenderer } = require("electron")
 var Tagify = require('@yaireo/tagify')
 
-// Variable that tracks which 'tab' is loaded
-var loaded = 'recipes'
+class NavBar {
+  constructor() {
+    this.loaded = 'recipes'
+    this.navBarContents = document.getElementById('navbar-contents')
+    this.constructButtonListeners()
 
-// TODO weird variable names here
-const constructRecipeList = function(recipe_list) {
-  const recipeList = document.createElement('ul')
-  recipeList.setAttribute('class', 'titles')
+    // Add event listeners for main process
+    ipcRenderer.on('display-tags', (evt, tags) => {
+      this.displayTags(tags)
+    })
 
-  const recipe_list_html = recipe_list.recipes.reduce((html, recipe_title) => {
-    html += `<li class = 'recipe-title'>${recipe_title}</li>`
-    return html
-  }, '')
+    ipcRenderer.on('display-recipe-list', (evt, recipeList) => {
+      this.displayRecipeList(recipeList)
+    })
 
-  recipeList.innerHTML = recipe_list_html
-  return(recipeList)
-}
+    ipcRenderer.on('display-search', () => {
+      this.displaySearch()
+    })
 
-const constructTagElm = function(tag_title) {
+    // Add button listeners
+
+  }
+
+
+  constructButtonListeners() {
+    // Recipes button
+    document.getElementById('recipes-btn').addEventListener('click', () => {
+      // If the recipes are already loaded do nothing, otherwise render them.
+      if(this.loaded != 'recipes') {
+        this.loaded = 'recipes'
+        ipcRenderer.send('get-recipe-titles')
+        this.navBarContents.innerHTML = ''
+      }
+    })
+
+    // Tags button
+    document.getElementById('tags-btn').addEventListener('click', () => {
+      if(this.loaded != 'tags') {
+        this.loaded = 'tags'
+        ipcRenderer.send('get-tags-nav')
+      }
+    })
+
+    // Search button
+    //document.getElementById('search-btn').addEventListener('click', () => {
+    //  if(loaded != 'search') {
+    //    loaded = 'search'
+
+    //    const navbar = document.getElementById('navbar-contents')
+    //    navbar.innerHTML = `
+    //    <div id="search-bar">
+    //      <input type="text" id="search-input">
+    //    </div>`
+
+    //    document.getElementById('search-input').addEventListener('input', (e) => {
+    //      const content = e.target.value
+    //      ipcRenderer.send('update-search', content)
+    //    })
+
+    //  }
+    //})
+  }
+
+  displayRecipeList(recipeList) {
+    var recipeListDiv = navbar.getElementsByClassName('recipe-list')[0]
+
+    // If titles div does not exist, make it
+    if(recipeListDiv == null) {
+      recipeListDiv = document.createElement('ul')
+      recipeListDiv.setAttribute('class', 'recipe-list')
+    } else {
+      // Otherwise clear its contents
+      recipeListDiv.innerHTML = ''
+    }
+
+    // Create html string
+    const titlesHTML = recipeList.reduce((html, title) => {
+      html += `<li class = 'recipe-title'>${title}</li>`
+      return html
+    }, '')
+
+    recipeListDiv.innerHTML = titlesHTML
+    this.navBarContents.appendChild(recipeListDiv)
+
+    this.navBarContents.querySelectorAll('.recipe-title').forEach(title => {
+      title.addEventListener('click', loadRecipe)
+    })
+  }
+
+  displayTags(tags) {
+    this.navBarContents.innerHTML=''
+    const tagNames = Object.keys(tags)
+
+    for(var i =0; i < tagNames.length; i++) {
+      const tagTitle = tagNames[i]
+
+      // A tagContainer holds the tagify element (tagElm) and the recipe list (recipeList)
+      const tagContainer = document.createElement('div')
+      tagContainer.setAttribute('class', 'tag-container')
+      tagContainer.classList.add(tags[tagTitle].division)
+
+      const tagElm = this.constructTagElm(tagTitle)
+      tagContainer.appendChild(tagElm)
+      this.navBarContents.appendChild(tagContainer)
+    }
+
+    this.navBarContents.querySelectorAll('.recipe-title').forEach(title => {
+      title.addEventListener('click', loadRecipe)
+    })
+
+    this.navBarContents.querySelectorAll('tag').forEach(tag => {
+      tag.addEventListener('click', handleTag)
+    })
+  }
+
+  constructTagElm(tagTitle) {
     const tagElm = document.createElement('tag')
-    tagElm.setAttribute('title', tag_title)
+    tagElm.setAttribute('title', tagTitle)
     tagElm.setAttribute('contenteditable', 'false')
     tagElm.setAttribute('spellcheck', 'false')
     tagElm.setAttribute('tabindex', '-1')
@@ -27,103 +126,10 @@ const constructTagElm = function(tag_title) {
     tagElm.setAttribute('__isvalid', 'true')
     tagElm.setAttribute('value', 'tag1')
     tagElm.innerHTML = `<div>
-        <span class="tagify__tag-text">${tag_title}</span>
+        <span class="tagify__tag-text">${tagTitle}</span>
     </div>`
     return(tagElm)
+  }
 }
 
-const constructTags = function(tags) {
-  const navbar_contents = document.getElementById('navbar-contents')
-  navbar_contents.innerHTML=''
-  const tag_names = Object.keys(tags)
-
-  for(var i =0; i < tag_names.length; i++) {
-    const tag_title = tag_names[i]
-
-    // A tagContainer holds the tagify element (tagElm) and the recipe list (recipeList)
-    const tagContainer = document.createElement('div')
-    tagContainer.setAttribute('class', 'tag-container')
-
-    const tagElm = constructTagElm(tag_title)
-    tagContainer.appendChild(tagElm)
-    navbar_contents.appendChild(tagContainer)
-  }
-
-  navbar_contents.querySelectorAll('.recipe-title').forEach(title => {
-    title.addEventListener('click', loadRecipe)
-  })
-
-
-  navbar_contents.querySelectorAll('tag').forEach(tag => {
-    tag.addEventListener('click', handleTag)
-  })
-}
-
-// Recipes button
-document.getElementById('recipes-btn').addEventListener('click', () => {
-  // If the recipes are already loaded do nothing, otherwise render them.
-  if(loaded != 'recipes') {
-    ipcRenderer.send('get-recipe-titles')
-    const navbar = document.getElementById('navbar-contents')
-    navbar.innerHTML = ''
-    loaded = 'recipes'
-  }
-})
-
-// Tags button
-document.getElementById('tags-btn').addEventListener('click', () => {
-  if(loaded != 'tags') {
-    loaded = 'tags'
-    ipcRenderer.send('get-tags-nav')
-  }
-})
-
-// Search button
-document.getElementById('search-btn').addEventListener('click', () => {
-  if(loaded != 'search') {
-    loaded = 'search'
-
-    const navbar = document.getElementById('navbar-contents')
-    navbar.innerHTML = `
-    <div id="search-bar">
-      <input type="text" id="search-input">
-    </div>`
-
-    document.getElementById('search-input').addEventListener('input', (e) => {
-      const content = e.target.value
-      ipcRenderer.send('update-search', content)
-    })
-
-  }
-})
-
-ipcRenderer.on('update-tags-nav', (event, tags) => {
-  constructTags(tags)
-})
-
-ipcRenderer.on('update-titles', (event, titles) => {
-  const navbar = document.getElementById('navbar-contents')
-  var titles_div = navbar.getElementsByClassName('titles')[0]
-
-  // If titles div does not exist, make it
-  if(titles_div == null) {
-    titles_div = document.createElement('ul')
-    titles_div.setAttribute('class', 'titles')
-  } else {
-    // Otherwise clear its contents
-    titles_div.innerHTML = ''
-  }
-
-  // Create html string
-  const titles_html = titles.reduce((html, title) => {
-    html += `<li class = 'recipe-title'>${title}</li>`
-    return html
-  }, '')
-
-  titles_div.innerHTML = titles_html
-  navbar.appendChild(titles_div)
-
-  navbar.querySelectorAll('.recipe-title').forEach(title => {
-    title.addEventListener('click', loadRecipe)
-  })
-})
+const navBar  = new NavBar()

@@ -20,6 +20,7 @@ class TagsStore extends Store {
     // this only gets run in development basically, we parse the 
     // recipesData for tags and sort the recipes that have those tags
     // into the correct data structure
+    this.tags = {}
 
     // FIXME if tags is empty, this crashes
     for(var i = 0; i < recipes.length; i++) {
@@ -29,18 +30,21 @@ class TagsStore extends Store {
 
         for(var j = 0; j < rec_i_tags.length; j++) {
           const tag_name = [rec_i_tags[j]['value']]
+          const tag_division = rec_i_tags[j]['division']
 
           // By default the tag division is 'Category'
-          this.addRecipe(rec_title, tag_name, 'Category')
+          if(tag_division) {
+            this.addRecipe(rec_title, tag_name, tag_division)
+          } else {
+            this.addRecipe(rec_title, tag_name, 'division-category')
+          }
         }
       }
     }
-
     return this.saveTags()
-
   }
 
-  addRecipe(recTitle, tagName) {
+  addRecipe(recTitle, tagName, division) {
     // Add the recipe to the list only if it is not already there
     if(this.tags[tagName] != undefined) {
       if(!this.tags[tagName].recipes.includes(recTitle)) {
@@ -50,16 +54,11 @@ class TagsStore extends Store {
       // Division is set to Category by default
       this.tags[tagName] = {
         'recipes' : [recTitle],
-        'division': 'Category'
+        'division': division
       }
     }
   }
 
-  setTagDivision(tagName, division) {
-    this.tags[tagName].division = division
-  }
-
-  // TODO this does nothing for the tag.divison
   updateTags(recipe) {
     const recTitle = recipe['title']
 
@@ -87,6 +86,10 @@ class TagsStore extends Store {
               if(recTitle_i != recTitle) {
               return(recTitle_i)
             }})
+
+            // finally, if the recList is empty, delete the tag completely from this.tags
+            if(this.tags[ix_tag].recipes[0] == undefined) { delete this.tags[ix_tag] }
+
           }
         } else {
           // Otherwise the rec_title does NOT belong to the tag currently. Check if 

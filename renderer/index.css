@@ -17,6 +17,7 @@ body{
 
 #navbar{
   background-color: #ededed;
+  min-width: 200px;
 }
 
 .tab {
@@ -39,7 +40,7 @@ body{
   flex-direction: column;
 }
 
-.titles {
+.recipe-list {
   padding-left: 18px;
   margin-top: 5px;
 }
@@ -65,11 +66,15 @@ body{
   --tags-border-color: none;
 }
 
-.tagify__tag.division-season{
+.division-category{
+  --tag-bg: #e8f7ff;
+}
+
+.division-season{
   --tag-bg: #feffd9;
 }
 
-.tagify__tag.division-source{
+.division-source{
   --tag-bg: #ffebf4;
 }
 

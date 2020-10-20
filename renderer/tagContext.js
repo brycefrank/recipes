@@ -5,7 +5,7 @@ var selectedTag = null
 
 // Initialize Split for the navbar and editor-frame
 const Split = require('split.js')
-const { ipcRenderer, ipcMain } = require('electron')
+//const { ipcRenderer, ipcMain } = require('electron')
 
 var instance = Split(['#navbar', '#editor-frame'], {
   sizes: [25, 75]
