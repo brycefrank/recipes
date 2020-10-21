@@ -1,5 +1,4 @@
 const { ipcRenderer } = require("electron")
-var Tagify = require('@yaireo/tagify')
 
 class NavBar {
   constructor() {
@@ -129,4 +128,3 @@ class NavBar {
   }
 }
 
-const navBar  = new NavBar()
