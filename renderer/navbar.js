@@ -19,11 +19,7 @@ class NavBar {
     ipcRenderer.on('display-search', () => {
       this.displaySearch()
     })
-
-    // Add button listeners
-
   }
-
 
   constructButtonListeners() {
     // Recipes button
@@ -45,23 +41,12 @@ class NavBar {
     })
 
     // Search button
-    //document.getElementById('search-btn').addEventListener('click', () => {
-    //  if(loaded != 'search') {
-    //    loaded = 'search'
-
-    //    const navbar = document.getElementById('navbar-contents')
-    //    navbar.innerHTML = `
-    //    <div id="search-bar">
-    //      <input type="text" id="search-input">
-    //    </div>`
-
-    //    document.getElementById('search-input').addEventListener('input', (e) => {
-    //      const content = e.target.value
-    //      ipcRenderer.send('update-search', content)
-    //    })
-
-    //  }
-    //})
+    document.getElementById('search-btn').addEventListener('click', () => {
+      if(this.loaded != 'search') {
+        this.loaded = 'search'
+        this.displaySearch() // this doesn't need interaction with main
+      }
+    })
   }
 
   displayRecipeList(recipeList) {
@@ -113,6 +98,18 @@ class NavBar {
 
     this.navBarContents.querySelectorAll('tag').forEach(tag => {
       tag.addEventListener('click', handleTag)
+    })
+  }
+
+  displaySearch() {
+    this.navBarContents.innerHTML = `
+      <div id="search-bar">
+        <input type="text" id="search-input">
+      </div>`
+
+    document.getElementById('search-input').addEventListener('input', (e) => {
+      const content = e.target.value
+      ipcRenderer.send('update-search', content)
     })
   }
 
