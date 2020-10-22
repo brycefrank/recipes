@@ -23,6 +23,7 @@ const toolbarOptions = [
   ['clean']    
 ]
 
-const navBar  = new NavBar()
+const tagContext = new TagContext()
+const navBar  = new NavBar(tagContext)
 const tagInput = new TagInput()
 const editor = new Editor(toolbarOptions, tagInput)

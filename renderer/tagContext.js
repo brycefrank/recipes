@@ -1,61 +1,42 @@
-// implements the tagContext menu
-// variable that tracks if the tagContext is displayed
-var tagContextDisplayed = false
-var selectedTag = null
-
-// Initialize Split for the navbar and editor-frame
 const Split = require('split.js')
-//const { ipcRenderer, ipcMain } = require('electron')
+
+// implements the tagContext menu
+class TagContext {
+  constructor(navBar) {
+    // The "parent" navBar
+    this.navBar = navBar
+    this.displayed = false
+    this.selectedTag = '' //FIXME is this typical to define it this way?
+
+    // Received tag-recipe-list from main
+    ipcRenderer.on('tag-recipe-list', (evt, titles) => {
+      this.constructContextMenu(titles)
+    })
+  }
+
+  // Displays the context with recipes belonging to tagTitle
+  display(tagTitle) {
+    // TODO This is basically another function that should be made in TagContext
+    if(this.displayed==true) {
+      if(tagTitle != this.selectedTag) {
+        ipcRenderer.send('get-tag-recipe-list', tagTitle)
+      }
+    } else {
+      // make the tagContext appear
+      this.displayed = true
+      this.selectedTag = title
+      // TODO this should be able to handle multiple tags (with shift click)
+      ipcRenderer.send('get-tag-recipe-list', tagTitle)
+    }
+  }
+}
+
+//var selectedTag = null
 
 var instance = Split(['#navbar', '#editor-frame'], {
   sizes: [25, 75]
 })
 
-const loadRecipe = (evt) => {
-  const title = evt.target.textContent
-  // Get the delta from main
-  ipcRenderer.send('load-recipe', title)
-
-  // "Dehighlight" any existing highlights
-  const recipe_titles = document.querySelectorAll('.recipe-title')
-  recipe_titles.forEach((el) => {
-    el.style.fontWeight='normal'
-  })
-
-  // Highlight (i.e. embolden) the recipe text in this element??
-  evt.target.style.fontWeight='bold'
-}
-
-// This is called when a tag in the navbar is clicked
-const handleTag = (evt) => {
-  // currentTarget refers to the element with the event listener
-  // and avoids returning the interior text of the tag
-  const tag = evt.currentTarget
-  const title = tag.getAttribute('title')
-
-  // de-embolden any tags
-  document.querySelectorAll('.tag-container').forEach((el) =>{
-    const tag_i = el.children[0]
-    tag_i.children[0].innerHTML = tag_i.getAttribute('title')
-  })
-
-  // embolden the tag text
-  // FIXME this seems unreasonably slow?
-  const tagText = tag.children[0]
-  tagText.innerHTML = `<b>${title}</b>`
-
-  if(tagContextDisplayed==true) {
-    if(title != selectedTag) {
-      ipcRenderer.send('get-tag-recipe-list', title)
-    }
-  } else {
-    // make the tagContext appear
-    tagContextDisplayed = true
-    selectedTag = title
-    // TODO this should be able to handle multiple tags (with shift click)
-    ipcRenderer.send('get-tag-recipe-list', title)
-  }
-}
 
 const deleteContextMenu = () => {
     instance.destroy()
@@ -116,7 +97,3 @@ const constructContextMenu = (titles) => {
   })
 }
 
-// Received tag-recipe-list from main
-ipcRenderer.on('tag-recipe-list', (evt, titles) => {
-  constructContextMenu(titles)
-})

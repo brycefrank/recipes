@@ -67,8 +67,6 @@ class TagInput extends Tagify {
         division = tagClassList[i]     
       }
     }
-
     return(division)
   }
-
 }
