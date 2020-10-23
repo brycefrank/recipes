@@ -160,7 +160,7 @@ function main () {
   })
 
   ipcMain.on('get-tag-recipe-list', (event, tag) => {
-    mainWindow.send('tag-recipe-list', tagsData.tags[tag])
+    mainWindow.send('display-tag-recipe-list', tagsData.tags[tag].recipes)
   })
 
   ipcMain.on('set-tag-division', (event, tagName, division) => {

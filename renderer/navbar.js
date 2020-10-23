@@ -1,11 +1,16 @@
-const { ipcRenderer } = require("electron")
 
 class NavBar {
-  constructor(tagContext) {
+  constructor() {
     this.loaded = 'recipes'
     this.navBarContents = document.getElementById('navbar-contents')
     this.constructButtonListeners()
-    this.tagContext = tagContext
+
+    // At this point the only splits are navbar and editor-frame
+    Split(['#navbar', '#editor-frame'], {
+      sizes: [25, 75]
+    })
+
+    this.tagContext = new TagContext()
 
     // Add event listeners for main process
     ipcRenderer.on('display-tags', (evt, tags) => {
@@ -94,12 +99,17 @@ class NavBar {
 
   // This is called when a tag in the navbar is clicked
   handleTag(evt, tagContext) {
+    if(!tagContext.displayed) {
+      tagContext.display()
+    }
+
+
     // currentTarget refers to the element with the event listener
     // and avoids returning the interior text of the tag
     const tag = evt.currentTarget
     const tagTitle = tag.getAttribute('title')
 
-    // de-embolden any tags
+    //// de-embolden any tags
     document.querySelectorAll('.tag-container').forEach((el) =>{
       const tag_i = el.children[0]
       tag_i.children[0].innerHTML = tag_i.getAttribute('title')
@@ -107,8 +117,7 @@ class NavBar {
 
     const tagText = tag.children[0]
     tagText.innerHTML = `<b>${tagTitle}</b>`
-    // TODO this is not showing up? Is it bc its a callback?
-    tagContext.display(tagTitle)
+    ipcRenderer.send('get-tag-recipe-list', tagTitle)
   }
 
   displayTags(tags) {
@@ -134,7 +143,7 @@ class NavBar {
 
     // FIXME this is broken because the meaning of "this" changes inside the forEach call
     this.navBarContents.querySelectorAll('tag').forEach(tag => {
-      tag.addEventListener('click', this.handleTag, this.tagContext)
+      tag.addEventListener('click', (evt)=>{this.handleTag(evt, this.tagContext)})
     })
   }
 
