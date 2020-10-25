@@ -18,8 +18,9 @@ class TagContext{
 
   /**
    * Displays the tagContext menu.
+   * @param {number} tagContextWidth The width in pixels of the tagContextMenu
    */
-  display() {
+  display(tagContextWidth=250) {
     // create the DOM elements
     const contextDOM = this.constructContextDOM()
 
@@ -32,7 +33,17 @@ class TagContext{
     gutters[0].remove()
 
     // set the split
-    Split(['#navbar', '#tag-context', '#editor-frame'])
+    // TODO I want the navbar to remain the same size. Right now it is "jiggling"
+    var navWidth = document.getElementById('navbar-contents').offsetWidth
+    navWidth = navWidth + 5 // Split.js removes 5 pixels by default, so add them back in
+
+    const bodyWidth = document.body.clientWidth 
+    const editorWidth = bodyWidth - tagContextWidth - navWidth
+
+
+    Split(['#navbar', '#tag-context', '#editor-frame'], {
+      sizes: [100 * navWidth/bodyWidth, 100 * tagContextWidth/bodyWidth, 100 * editorWidth/bodyWidth]
+    })
 
     this.displayed = true
   }
@@ -51,6 +62,7 @@ class TagContext{
       }
 
       // reinstantiate the original Split
+      // TODO I want the navbar to remain the same size. Right now it is "jiggling"
       Split(['#navbar', '#editor-frame'])
       
       this.displayed = false
