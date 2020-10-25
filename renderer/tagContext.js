@@ -61,9 +61,17 @@ class TagContext{
         gutters[0].parentNode.removeChild(gutters[0]);
       }
 
-      // reinstantiate the original Split
-      // TODO I want the navbar to remain the same size. Right now it is "jiggling"
-      Split(['#navbar', '#editor-frame'])
+      // reinstantiate the original Split with correct widths
+      var navWidth = document.getElementById('navbar-contents').offsetWidth
+      navWidth = navWidth + 5 // Split.js removes 5 pixels by default, so add them back in
+
+      const bodyWidth = document.body.clientWidth 
+      const editorWidth = bodyWidth - navWidth
+
+
+      Split(['#navbar', '#editor-frame'], {
+        sizes: [100 * navWidth / bodyWidth, 100 * editorWidth / bodyWidth]
+      })
       
       this.displayed = false
     }
