@@ -13,7 +13,6 @@ class TagContext{
     })
   }
 
-
   // displays the empty context menu
   display() {
     // create the DOM elements

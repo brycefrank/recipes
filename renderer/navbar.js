@@ -1,4 +1,6 @@
-
+/**
+ * Implements the navigation bar, the left-most menu system
+ */
 class NavBar {
   constructor() {
     this.loaded = 'recipes'
@@ -26,6 +28,9 @@ class NavBar {
     })
   }
 
+  /**
+   * Assigns event listeners to the Recipes, Tags and Search buttons in the navBar
+   */
   constructButtonListeners() {
     // Recipes button
     document.getElementById('recipes-btn').addEventListener('click', () => {
@@ -54,7 +59,10 @@ class NavBar {
     })
   }
 
-  // Callback used in the event listener for recipe-title click
+  /**
+   * Used in the callback to display the clicked recipe in the navBar.
+   * @param {object} evt The event emitted from the callback.
+   */
   displayRecipe(evt) {
     const title = evt.target.textContent
     // Get the delta from main
@@ -70,6 +78,10 @@ class NavBar {
     evt.target.style.fontWeight='bold'
   }
 
+  /**
+   * Displays the recipeList, adds click event listener to each element.
+   * @param {string[]} An array containing all recipes in the data.
+   */
   displayRecipeList(recipeList) {
     var recipeListDiv = navbar.getElementsByClassName('recipe-list')[0]
 
@@ -92,17 +104,20 @@ class NavBar {
     this.navBarContents.appendChild(recipeListDiv)
 
     this.navBarContents.querySelectorAll('.recipe-title').forEach(title => {
-      title.addEventListener('click', this.loadRecipe)
+      title.addEventListener('click', this.displayRecipe)
     })
   }
 
 
-  // This is called when a tag in the navbar is clicked
+  /**
+   * Function used in the callback when a tag is clicked in the navBar.
+   * @param {object} evt The event emitted from the callback.
+   * @param {object} tagContext An object of class TagContext that represents the tagContext menu.
+   */
   handleTag(evt, tagContext) {
     if(!tagContext.displayed) {
       tagContext.display()
     }
-
 
     // currentTarget refers to the element with the event listener
     // and avoids returning the interior text of the tag
@@ -120,6 +135,10 @@ class NavBar {
     ipcRenderer.send('get-tag-recipe-list', tagTitle)
   }
 
+  /**
+   * Displays all existing the tags in the navBar.
+   * @param {object[]} tags Received from main, an array of tag objects.
+   */
   displayTags(tags) {
     this.navBarContents.innerHTML=''
     const tagNames = Object.keys(tags)
@@ -147,6 +166,9 @@ class NavBar {
     })
   }
 
+  /**
+   * Displays the search interface in the navBar.
+   */
   displaySearch() {
     this.navBarContents.innerHTML = `
       <div id="search-bar">
@@ -159,6 +181,10 @@ class NavBar {
     })
   }
 
+  /**
+   * Constructs the DOM element representing a tag.
+   * @param {string} tagTitle The title of the tag.
+   */
   constructTagElm(tagTitle) {
     const tagElm = document.createElement('tag')
     tagElm.setAttribute('title', tagTitle)
