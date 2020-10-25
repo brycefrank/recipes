@@ -1,6 +1,9 @@
 const Quill = require('quill')
 
-// The Editor is the title, tagify input, quill editor and buttons
+/**
+ * A class used to handle editor omponents including the title, tagInput and
+ * a Quill editor
+ */
 class Editor {
   constructor(toolbarOptions, tagInput) {
     this.qEditor = new Quill('#editor', {
@@ -36,6 +39,9 @@ class Editor {
     })
   }
 
+  /**
+   * Adds event listeners to Save and Delete buttons.
+   */
   constructButtonListeners() {
     // Save button
     document.getElementById('save-content-btn').addEventListener('click', () => {
@@ -52,6 +58,12 @@ class Editor {
   }
 
   // Get the recipe object from a tag element
+  /**
+   * For a given recipe title, return its object. Used in the event listener for the save button
+   * to send the recipe object to main process.
+   * @param {string} recTitle A string representing the recipe title.
+   * @returns {object} A recipe object that contains the title, tags and qEditor delta.
+   */
   getRecipeObj(recTitle) {
     // TODO could hold a reference to this in the constructor?
     // or it may already exist in Tagify class

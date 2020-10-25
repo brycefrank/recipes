@@ -184,6 +184,7 @@ class NavBar {
   /**
    * Constructs the DOM element representing a tag.
    * @param {string} tagTitle The title of the tag.
+   * @returns {object} A DOM element representing the tag.
    */
   constructTagElm(tagTitle) {
     const tagElm = document.createElement('tag')

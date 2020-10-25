@@ -68,6 +68,12 @@ class TagInput extends Tagify {
     }
   }
 
+  /**
+   * 
+   * @param {object} tagClassList A DOMTokenList of containing the classes of the target tag.
+   * @returns{string} A string representing the division class in the format 
+   * 'division-[division-class]'
+   */
   parseTagDivision = (tagClassList) => {
     var division = undefined
 
