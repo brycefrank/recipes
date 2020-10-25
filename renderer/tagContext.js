@@ -2,7 +2,10 @@ const { ipcRenderer } = require('electron')
 const Split = require('split.js')
 
 
-
+/**
+ * Impelements the tagContext menu that appears when a tag is 
+ * clicked in the navBar.
+ */
 class TagContext{
   constructor() {
     this.displayed = false
@@ -13,7 +16,9 @@ class TagContext{
     })
   }
 
-  // displays the empty context menu
+  /**
+   * Displays the tagContext menu.
+   */
   display() {
     // create the DOM elements
     const contextDOM = this.constructContextDOM()
@@ -32,6 +37,9 @@ class TagContext{
     this.displayed = true
   }
 
+  /**
+   * Hides the tagContext menu.
+   */
   hide() {
     if(this.displayed) {
       // Select the DOM elements and the "gutter" from split and delete
@@ -49,8 +57,10 @@ class TagContext{
     }
   }
 
-  // TODO duplicated (basically) from navbar, one option is to make "controller" or 
-  // "event listener"? object that handles all click events
+  /**
+   * Used in the click event of a recipe in the Context menu.
+   * @param {object} evt Event object from the callback.
+   */
   displayRecipe(evt) {
     const title = evt.target.textContent
     // Get the delta from main
@@ -66,6 +76,9 @@ class TagContext{
     evt.target.style.fontWeight='bold'
   }
 
+  /**
+   * Removes any existing recipes displayed in the tagContext menu.
+   */
   removeRecipeList() {
     var recipeListDOM = document.getElementById('tag-context').getElementsByClassName('recipe-title')
 
@@ -76,6 +89,10 @@ class TagContext{
     }
   }
 
+  /**
+   * Displays the recipeList in the tagContext menu. 
+   * @param {string[]} recipeList An array containing all recipes in the data.
+   */
   displayRecipeList(recipeList) {
     this.removeRecipeList()
 
@@ -91,6 +108,10 @@ class TagContext{
 
   }
 
+  /**
+   * Constructs the DOM element representing the recipeList.
+   * @param {string[]} recipeList An array containing all recipes in the data.
+   */
   constructRecipeListDOM(recipeList) {
     var recipeListDiv = document.createElement('ul')
     recipeListDiv.setAttribute('class', 'recipe-list')
@@ -99,10 +120,12 @@ class TagContext{
       html += `<li class = 'recipe-title'>${title}</li>`
       return html
     }, '')
-
     return(titlesHTML)
   }
 
+  /**
+   * Constructs the DOM element representing the tagContext with no recipes displayed.
+   */
   constructContextDOM() {
     var tagContextDOM = document.createElement('div')
     tagContextDOM.setAttribute('id', 'tag-context')

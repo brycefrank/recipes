@@ -80,7 +80,7 @@ class NavBar {
 
   /**
    * Displays the recipeList, adds click event listener to each element.
-   * @param {string[]} An array containing all recipes in the data.
+   * @param {string[]} recipeList An array containing all recipes in the data.
    */
   displayRecipeList(recipeList) {
     var recipeListDiv = navbar.getElementsByClassName('recipe-list')[0]
