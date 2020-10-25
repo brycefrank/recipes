@@ -1,7 +1,8 @@
 var Tagify = require('@yaireo/tagify')
 
-// TagInput extends Tagify to handle some specific modifications
-// to allow for setting of the division-* classes
+/**
+ * A class used to input tags in the editor.
+ */
 class TagInput extends Tagify {
   constructor() {
     const tagInput = document.querySelector('input[name=tags]')
@@ -15,7 +16,11 @@ class TagInput extends Tagify {
     })
   }
 
-  // Adds contextmenu listener to each tag for right clicks
+  /**
+   * For a given tag, attach an event listener for right clicks. Right click menus are used for 
+   * setting the division of a given tag.
+   * @param {object} tag The DOM element of a tag.
+   */
   addContextListener(tag) {
     tag.addEventListener('contextmenu', (e) => {
       e.preventDefault();
@@ -40,7 +45,11 @@ class TagInput extends Tagify {
     })
   }
 
-  // Sets the division-class of a tag DOM element
+  /**
+   * Sets the division of a tag, used in the right-click event listener.
+   * @param {object} tag The DOM element of a tag.
+   * @param {string} division The division class, a string in the format 'division-[division class]'
+   */
   setDivision(tag, division) {
     var newDivision = division
     const classList  = tag.classList
