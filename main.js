@@ -69,9 +69,22 @@ function selectRecipe(window, recipe, sort_tags = true) {
     recipeTags = sortTags(recipe)
   }
 
+  // TODO ask if the Editor is unedited or, if edited, has been saved. If so, send the new contents
   window.send('render-delta', recipe['delta']) 
   window.send('render-tags', recipeTags) 
   window.send('update-title-bar', recipe['title'])
+}
+
+function saveRecipe(recipe, loaded) {
+  recpiesData = recipesData.addRecipe(recipe)
+  const titles = recipesData.getRecipes().parseTitles()
+
+  if(loaded == 'recipes') {
+    mainWindow.send('update-titles', titles, recipe['title'])
+  }
+
+  // Update the tagsData
+  tagsData.updateTags(recipe)
 }
 
 function main () {
@@ -113,21 +126,16 @@ function main () {
   })
 
   ipcMain.on('save-recipe', (event, recipe, loaded) => {
-    recpiesData = recipesData.addRecipe(recipe)
-    const titles = recipesData.getRecipes().parseTitles()
-
-    if(loaded == 'recipes') {
-      mainWindow.send('update-titles', titles, recipe['title'])
-    }
-
-    // Update the tagsData
-    tagsData.updateTags(recipe)
+    saveRecipe(recipe, loaded)
   });
 
 
-  ipcMain.on('load-recipe', (event, title) => {
-    // When a recipeis lodaed we render the delta in the editor,
+  // TODO this is more of a "request" to load...if the user hasn't saved another
+  // event fires, make this event name more clear
+  ipcMain.on('load-recipe', (event, title, oldTitle, loaded) => {
+    // When a recipe is loaded we render the delta in the editor,
     // update the title bar, and highlight the selected recipe in the navbar
+
     const recipe = recipesData.getRecipe(title)
     selectRecipe(mainWindow, recipe)
   })

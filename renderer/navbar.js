@@ -28,6 +28,7 @@ class NavBar {
     })
   }
 
+
   /**
    * Assigns event listeners to the Recipes, Tags and Search buttons in the navBar
    */
@@ -63,10 +64,12 @@ class NavBar {
    * Used in the callback to display the clicked recipe in the navBar.
    * @param {object} evt The event emitted from the callback.
    */
-  displayRecipe(evt) {
+  displayRecipe(evt, navBarContents, loaded) {
     const title = evt.target.textContent
+    const oldTitle = document.getElementById('title').innerText
+
     // Get the delta from main
-    ipcRenderer.send('load-recipe', title)
+    ipcRenderer.send('load-recipe', title, oldTitle)
 
     // "Dehighlight" any existing highlights
     const recipe_titles = this.navBarContents.querySelectorAll('.recipe-title')
@@ -104,7 +107,9 @@ class NavBar {
     this.navBarContents.appendChild(recipeListDiv)
 
     this.navBarContents.querySelectorAll('.recipe-title').forEach(title => {
-      title.addEventListener('click', this.displayRecipe)
+      title.addEventListener('click', (evt) => {
+        this.displayRecipe(evt, this.navBarContents, this.loaded)
+      })
     })
   }
 

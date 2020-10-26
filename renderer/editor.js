@@ -1,4 +1,5 @@
 const Quill = require('quill')
+const EventEmitter = require('events');
 
 /**
  * A class used to handle editor omponents including the title, tagInput and
@@ -16,6 +17,7 @@ class Editor {
 
     this.tagInput = tagInput
     this.constructButtonListeners()
+    this.constructChangeListeners()
 
     // Event listeners for main
     ipcRenderer.on('render-delta', (event, delta) => {
@@ -37,6 +39,43 @@ class Editor {
       const title_html = document.getElementById('title')
       title_html.innerHTML = `<h1>${title}</h1>`
     })
+  }
+
+  /**
+   * These event listeners listen for a change in the title, tagInput or qEditor, if any change
+   * was made, this.edited is set to true, which is used to fire a confirmation event if leaving
+   * an unsaved recipe.
+   */
+  constructChangeListeners() {
+    // Listener for the editor itself
+    this.qEditor.on('text-change', () => {
+      this.edited = true
+      this.qEditor.off('text-change')
+    })
+
+    // Listener for the tagInput add and remove events
+    // FIXME it does not appear that the .offs are working for these
+    this.tagInput.on('add', () => {
+      this.edited = true
+      this.tagInput.off('add')
+    })
+
+    this.tagInput.on('remove', () => {
+      this.edited = true
+      this.tagInput.off('remove')
+    })
+
+    // Listener for title change
+    const titleDOM = document.getElementById('title')
+
+    // We apparently need a named function for this...
+    // FIXME still does not get removed?
+    var titleInputHandler = function(evt) {
+      this.edited = true
+      titleDOM.removeEventListener('input', titleInputHandler)
+    }
+
+    titleDOM.addEventListener('input', titleInputHandler)
   }
 
   /**
