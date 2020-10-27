@@ -19,13 +19,26 @@ class Editor {
     this.constructButtonListeners()
     this.constructChangeListeners()
 
-    // Event listeners for main
-    ipcRenderer.on('render-delta', (event, delta) => {
-      // Render the delta
-      this.qEditor.setContents(delta)
+    this.edited = false
+    this.currentRecipeTitle = ''
+
+    ipcRenderer.on('attempt-load-recipe', (evt, newRecipeTitle) => {
+      if(newRecipeTitle != this.currentRecipeTitle) {
+        if(this.edited) {
+          // FIXME navbar.loaded is only used for a poorly designed highlighting system
+          // that needs to get decoupled.
+          const currentRecipe = this.getRecipeObj(this.currentRecipeTitle)
+          ipcRenderer.send('confirm-leave-recipe', newRecipeTitle, currentRecipe, navbar.loaded)
+        } else {
+          this.currentRecipeTitle = newRecipeTitle
+          ipcRenderer.send('load-recipe', newRecipeTitle)
+        }
+      }
     })
 
-    ipcRenderer.on('render-tags', (event, tags) => {
+    ipcRenderer.on('load-recipe', (evt, delta, tags, title) => {
+      this.qEditor.setContents(delta)
+
       // Remove the tags
       this.tagInput.removeAllTags()
       
@@ -33,11 +46,12 @@ class Editor {
       if(tags.length > 0 ) {
         this.tagInput.addTags(tags)
       }
-    })
 
-    ipcRenderer.on('update-title-bar', (event, title) => {
       const title_html = document.getElementById('title')
       title_html.innerHTML = `<h1>${title}</h1>`
+
+      this.currentRecipeTitle = title
+      this.edited=false
     })
   }
 
@@ -47,22 +61,22 @@ class Editor {
    * an unsaved recipe.
    */
   constructChangeListeners() {
+    // TODO it would be best to remove the event listeners after they are fired
+    // and then re-instantiate them after a new recipe loads
+
     // Listener for the editor itself
     this.qEditor.on('text-change', () => {
       this.edited = true
-      this.qEditor.off('text-change')
     })
 
     // Listener for the tagInput add and remove events
     // FIXME it does not appear that the .offs are working for these
     this.tagInput.on('add', () => {
       this.edited = true
-      this.tagInput.off('add')
     })
 
     this.tagInput.on('remove', () => {
       this.edited = true
-      this.tagInput.off('remove')
     })
 
     // Listener for title change
@@ -72,7 +86,6 @@ class Editor {
     // FIXME still does not get removed?
     var titleInputHandler = function(evt) {
       this.edited = true
-      titleDOM.removeEventListener('input', titleInputHandler)
     }
 
     titleDOM.addEventListener('input', titleInputHandler)
@@ -87,6 +100,7 @@ class Editor {
       const recTitle = document.getElementById('title').textContent
       const recipe =  this.getRecipeObj(recTitle)
       ipcRenderer.send('save-recipe', recipe, this.loaded)
+      this.edited = false
     })
 
     // Delete button

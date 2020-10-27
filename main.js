@@ -69,16 +69,14 @@ function selectRecipe(window, recipe, sort_tags = true) {
     recipeTags = sortTags(recipe)
   }
 
-  // TODO ask if the Editor is unedited or, if edited, has been saved. If so, send the new contents
-  window.send('render-delta', recipe['delta']) 
-  window.send('render-tags', recipeTags) 
-  window.send('update-title-bar', recipe['title'])
+  window.send('load-recipe', recipe['delta'], recipeTags, recipe['title']) 
 }
 
 function saveRecipe(recipe, loaded) {
   recpiesData = recipesData.addRecipe(recipe)
   const titles = recipesData.getRecipes().parseTitles()
 
+  // TODO this seems out of place
   if(loaded == 'recipes') {
     mainWindow.send('update-titles', titles, recipe['title'])
   }
@@ -125,18 +123,39 @@ function main () {
     })
   })
 
-  ipcMain.on('save-recipe', (event, recipe, loaded) => {
+  ipcMain.on('save-recipe', (evt, recipe, loaded) => {
     saveRecipe(recipe, loaded)
   });
 
+  ipcMain.on('attempt-load-recipe', (evt, recipeTitle) => {
+    mainWindow.send('attempt-load-recipe', recipeTitle)
+  })
 
-  // TODO this is more of a "request" to load...if the user hasn't saved another
-  // event fires, make this event name more clear
-  ipcMain.on('load-recipe', (event, title, oldTitle, loaded) => {
+  ipcMain.on('confirm-leave-recipe', (evt, newRecipeTitle, currentRecipe, loaded) => {
+    const res = dialog.showMessageBox(null, {
+      type: 'question',
+      message: 'You have not saved, are you sure you want to change recipes?',
+      buttons: ['Save', 'Proceed without Saving', 'Cancel']
+    })
+
+    res.then((returnVal) => {
+      const index = returnVal.response
+      if        (index == 0) { // Save and continue
+        saveRecipe(currentRecipe, loaded)
+
+        const newRecipe = recipesData.getRecipe(newRecipeTitle)
+        selectRecipe(mainWindow, newRecipe)
+      } else if (index == 1) { // Proceed without Saving
+        const newRecipe = recipesData.getRecipe(newRecipeTitle)
+        selectRecipe(mainWindow, newRecipe)
+      }
+    })
+  })
+
+  ipcMain.on('load-recipe', (evt, recipeTitle, loaded) => {
     // When a recipe is loaded we render the delta in the editor,
     // update the title bar, and highlight the selected recipe in the navbar
-
-    const recipe = recipesData.getRecipe(title)
+    const recipe = recipesData.getRecipe(recipeTitle)
     selectRecipe(mainWindow, recipe)
   })
 

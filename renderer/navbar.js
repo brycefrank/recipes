@@ -66,10 +66,9 @@ class NavBar {
    */
   displayRecipe(evt, navBarContents, loaded) {
     const title = evt.target.textContent
-    const oldTitle = document.getElementById('title').innerText
 
-    // Get the delta from main
-    ipcRenderer.send('load-recipe', title, oldTitle)
+    // Attempt to load the recipe
+    ipcRenderer.send('attempt-load-recipe', title)
 
     // "Dehighlight" any existing highlights
     const recipe_titles = this.navBarContents.querySelectorAll('.recipe-title')
