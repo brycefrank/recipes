@@ -3,14 +3,14 @@ const Delta = require('quill-delta')
 const toPlaintext = require('quill-delta-to-plaintext')
 
 class SearchIndex {
-  constructor(dataStore) {
+  constructor(recipeStore) {
     this.index = elasticlunr(function() {
       this.setRef('title') // FIXME this could be replace with some numerical id probably
       this.addField('title')
       this.addField('text')
     })
 
-    dataStore.recipes.forEach(recipe => {
+    recipeStore.recipes.forEach(recipe => {
       // TODO a little clunky, it seems that the Delta object
       // is lost when we write it to electron-store, so we have
       // to convert it back to a Delta, would be nice to eliminate this

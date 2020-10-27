@@ -1,8 +1,6 @@
-'use strict'
-
 const Store = require('electron-store')
 
-class DataStore extends Store {
+class RecipeStore extends Store {
   constructor (settings) {
     super(settings)
 
@@ -42,6 +40,7 @@ class DataStore extends Store {
     // check if recipe key is already in recipes...
     // if so just overwrite the recipe indicated by the key
     if (this.recipes.length == 0) {
+      recipe['dateCreated'] = Date.now()
       this.recipes = [ ...this.recipes, recipe ]
     } else {
 
@@ -52,11 +51,13 @@ class DataStore extends Store {
           update = true
           this.recipes[i]['delta'] = recipe['delta']
           this.recipes[i]['tags'] = recipe['tags']
+          this.recipes[i]['dateLastModified'] = Date.now()
         }
       }
 
       if(!update) {
         // no duplicate recipe found, append to the list
+        recipe['dateCreated'] = Date.now()
         this.recipes = [...this.recipes, recipe]
       }
     }
@@ -78,4 +79,4 @@ class DataStore extends Store {
 
 }
 
-module.exports = DataStore
+module.exports = RecipeStore

@@ -1,26 +1,27 @@
 const path = require('path')
 const { app, dialog, ipcMain, Menu, MenuItem } = require('electron')
 const env = process.env.NODE_ENV || 'development';
-const Window = require('./Window')
-const DataStore = require('./DataStore');
-const TagsStore = require('./TagsStore');
+const Window = require('./modules/Window')
+const RecipeStore = require('./modules/RecipeStore');
+const SettingsStore = require('./modules/SettingsStore');
+const TagsStore = require('./modules/TagsStore');
 const fs = require('fs');
-const SearchIndex = require('./SearchIndex');
+const SearchIndex = require('./modules/SearchIndex');
 
 // Recipe storage
 const dataName = 'RecipesMain'
-var recipesData = new DataStore({name: dataName})
-const dataPath = path.join(app.getPath('appData'), app.getName(), 'RecipesMain.JSON');
+var recipesData = new RecipeStore({name: dataName})
 
 // Tag storage
 const tagsName = 'TagsMain'
 var tagsData = new TagsStore({name: tagsName})
-const tagsPath = path.join(app.getPath('appData'), app.getName(), 'TagsMain.JSON');
+
+// Settings storage
+const settingsName = 'Settings'
+var settingsData = new SettingsStore({name: settingsName})
 
 // Search engine
 const searchIndex = new SearchIndex(recipesData)
-
-// Context window
 
 if (env === 'development') { 
     try { 
@@ -69,17 +70,13 @@ function selectRecipe(window, recipe, sort_tags = true) {
     recipeTags = sortTags(recipe)
   }
 
+  settingsData.setSelectedRecipe(recipe['title'])
   window.send('load-recipe', recipe['delta'], recipeTags, recipe['title']) 
 }
 
-function saveRecipe(recipe, loaded) {
+function saveRecipe(recipe) {
   recpiesData = recipesData.addRecipe(recipe)
   const titles = recipesData.getRecipes().parseTitles()
-
-  // TODO this seems out of place
-  if(loaded == 'recipes') {
-    mainWindow.send('update-titles', titles, recipe['title'])
-  }
 
   // Update the tagsData
   tagsData.updateTags(recipe)
@@ -95,11 +92,13 @@ function main () {
   // Once the main window is displayed, send the list of recipes to
   // the renderer
   mainWindow.once('show', () => {
-    const titles = recipesData.getRecipes().parseTitles()
+    const recipeList = recipesData.getRecipes().parseTitles()
 
     // TODO what if there are no recipes?
-    mainWindow.send('update-titles', titles)
-    selectRecipe(mainWindow, recipesData.recipes[0])
+    mainWindow.send('display-recipe-list', recipeList)
+
+    const lastRecipe = recipesData.getRecipe(settingsData.getSelectedRecipeTitle())
+    selectRecipe(mainWindow, lastRecipe)
     tagsData.organizeTags(recipesData.recipes)
   })
 
@@ -112,8 +111,6 @@ function main () {
     dialog.showMessageBox(options).then((data) => {
       if(data.response == 0) {
         recipesData = recipesData.deleteRecipe(title)    
-        const titles = recipesData.getRecipes().parseTitles()
-        mainWindow.send('update-titles', titles)
 
         // Load the first recipe
         const first_recipe = recipesData.recipes[0]
@@ -123,7 +120,7 @@ function main () {
     })
   })
 
-  ipcMain.on('save-recipe', (evt, recipe, loaded) => {
+  ipcMain.on('save-recipe', (evt, recipe) => {
     saveRecipe(recipe, loaded)
   });
 
@@ -174,7 +171,7 @@ function main () {
 
       var matched_titles = []
       result.forEach(res => {
-        // titles is listed is stored as 'ref' in the searchIndex
+        // titles are listed as stored as 'ref' in the searchIndex
         matched_titles.push(res['ref'])
       })
       mainWindow.send('display-recipe-list', matched_titles)

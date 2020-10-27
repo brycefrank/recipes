@@ -1,12 +1,11 @@
 const { ipcRenderer } = require('electron')
 const Split = require('split.js')
 
-
 /**
  * Impelements the tagContext menu that appears when a tag is 
  * clicked in the navBar.
  */
-class TagContext{
+class TagContext {
   constructor() {
     this.displayed = false
 
@@ -33,7 +32,6 @@ class TagContext{
     gutters[0].remove()
 
     // set the split
-    // TODO I want the navbar to remain the same size. Right now it is "jiggling"
     var navWidth = document.getElementById('navbar-contents').offsetWidth
     navWidth = navWidth + 5 // Split.js removes 5 pixels by default, so add them back in
 
@@ -84,9 +82,10 @@ class TagContext{
   displayRecipe(evt) {
     const title = evt.target.textContent
     // Get the delta from main
-    ipcRenderer.send('load-recipe', title)
+    ipcRenderer.send('attempt-load-recipe', title)
 
     // "Dehighlight" any existing highlights
+    // FIXME this is not consistent with the new "attempt-load-recipe" logic
     const recipe_titles = document.getElementById('tag-context').querySelectorAll('.recipe-title')
     recipe_titles.forEach((el) => {
       el.style.fontWeight='normal'
