@@ -37,6 +37,7 @@ class Editor {
     })
 
     ipcRenderer.on('load-recipe', (evt, delta, tags, title) => {
+      this.qEditor.setText('') // doing this is quicker than just doing the delta
       this.qEditor.setContents(delta)
 
       // Remove the tags

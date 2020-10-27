@@ -26,8 +26,11 @@ class NavBar {
     ipcRenderer.on('display-search', () => {
       this.displaySearch()
     })
-  }
 
+    ipcRenderer.on('highlight-recipe', (evt, recipeTitle) => {
+      this.highlightRecipe(recipeTitle)
+    })
+  }
 
   /**
    * Assigns event listeners to the Recipes, Tags and Search buttons in the navBar
@@ -61,6 +64,26 @@ class NavBar {
   }
 
   /**
+   * Highlights the recipe DOM elements that match the recipeTitle.
+   * @param {string} recipeTitle A string representing the title of the recipe to highlight.
+   */
+  highlightRecipe(recipeTitle) {
+    // TODO also need to do this for the tagContext...
+    // "Dehighlight" any existing highlights
+    const recipeTitles = document.querySelectorAll('.recipe-title')
+    recipeTitles.forEach((el) => {
+      if(el.innerText == recipeTitle) {
+        el.style.fontWeight='bold'
+      } else {
+        el.style.fontWeight='normal'
+      }
+    })
+
+    // Highlight (i.e. embolden) the recipe text in this element??
+    //evt.target.style.fontWeight='bold'
+  }
+
+  /**
    * Used in the callback to display the clicked recipe in the navBar.
    * @param {object} evt The event emitted from the callback.
    */
@@ -70,14 +93,6 @@ class NavBar {
     // Attempt to load the recipe
     ipcRenderer.send('attempt-load-recipe', title)
 
-    // "Dehighlight" any existing highlights
-    const recipe_titles = this.navBarContents.querySelectorAll('.recipe-title')
-    recipe_titles.forEach((el) => {
-      el.style.fontWeight='normal'
-    })
-
-    // Highlight (i.e. embolden) the recipe text in this element??
-    evt.target.style.fontWeight='bold'
   }
 
   /**

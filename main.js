@@ -72,6 +72,7 @@ function selectRecipe(window, recipe, sort_tags = true) {
 
   settingsData.setSelectedRecipe(recipe['title'])
   window.send('load-recipe', recipe['delta'], recipeTags, recipe['title']) 
+  window.send('highlight-recipe', recipe['title']) 
 }
 
 function saveRecipe(recipe) {
@@ -121,7 +122,7 @@ function main () {
   })
 
   ipcMain.on('save-recipe', (evt, recipe) => {
-    saveRecipe(recipe, loaded)
+    saveRecipe(recipe)
   });
 
   ipcMain.on('attempt-load-recipe', (evt, recipeTitle) => {
@@ -138,7 +139,7 @@ function main () {
     res.then((returnVal) => {
       const index = returnVal.response
       if        (index == 0) { // Save and continue
-        saveRecipe(currentRecipe, loaded)
+        saveRecipe(currentRecipe)
 
         const newRecipe = recipesData.getRecipe(newRecipeTitle)
         selectRecipe(mainWindow, newRecipe)
