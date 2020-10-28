@@ -160,15 +160,14 @@ class NavBar {
    */
   displayTags(tags) {
     this.navBarContents.innerHTML=''
-    const tagNames = Object.keys(tags)
 
-    for(var i =0; i < tagNames.length; i++) {
-      const tagTitle = tagNames[i]
+    for(var i =0; i < tags.length; i++) {
+      const tagTitle = tags[i].value
 
       // A tagContainer holds the tagify element (tagElm) and the recipe list (recipeList)
       const tagContainer = document.createElement('div')
       tagContainer.setAttribute('class', 'tag-container')
-      tagContainer.classList.add(tags[tagTitle].division)
+      tagContainer.classList.add(tags[i].division)
 
       const tagElm = this.constructTagElm(tagTitle)
       tagContainer.appendChild(tagElm)

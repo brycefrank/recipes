@@ -29,45 +29,34 @@ if (env === 'development') {
     } catch (_) { console.log(_); }     
 } 
 
-const sortTags = (recipe) => {
-  var tagSort = Array(2).fill(-1)
+const sortTags = (tags) => {
   var nonDivIxs = []
+  var sourceIxs = []
+  var seasonIxs = []
 
-  for(const [ix, tag] of Object.entries(recipe['tags'])){
+  for(const [ix, tag] of Object.entries(tags)){
     if(tag.division == 'division-source') {
-      tagSort[0] = ix
+      sourceIxs.push(ix)
     } else if (tag.division == 'division-season'){
-      tagSort[1] = ix
+      seasonIxs.push(ix)
     } else {
       nonDivIxs.push(ix)
     }
   }
 
-  // If the first element is -1, it implies we did not find
-  // a division-source, so the division-season becomes the first tag
-  // if both are -1, we didn't find either
-  if(tagSort[0] == -1 && tagSort[1] != -1) {
-    tagSort[0] = tagSort[1]
-    tagSort[1] = -1
-    tagSort = [tagSort[0]]
-  } else if (tagSort[0] == -1 && tagSort[1] == -1) {
-    tagSort = []
-  }
+  var tagSort = [].concat(sourceIxs, seasonIxs, nonDivIxs)
 
-  // Push the remaining indices
-  nonDivIxs.forEach((ix) => (tagSort.push(ix)))
+  var outTags = []
+  tagSort.forEach((ix) => (outTags.push(tags[ix])))
 
-  var recipeTags = []
-  tagSort.forEach((ix) => (recipeTags.push(recipe['tags'][ix])))
-
-  return(recipeTags)
+  return(outTags)
 }
 
 function selectRecipe(window, recipe, sort_tags = true) {
   var recipeTags = recipe['tags']
 
   if(sort_tags) {
-    recipeTags = sortTags(recipe)
+    recipeTags = sortTags(recipe.tags)
   }
 
   settingsData.setSelectedRecipe(recipe['title'])
@@ -181,7 +170,19 @@ function main () {
 
 
   ipcMain.on('get-tags-nav', (event) => {
-    mainWindow.send('display-tags', tagsData.tags)
+    // sortTags assumes the tags are arranged in a list of objects, we make that here
+    var tagArray = []
+    for(const [tagTitle, tagObj] of Object.entries(tagsData.tags)) {
+      const tagObjFmt = {}
+
+      tagObjFmt['value'] = tagTitle
+      tagObjFmt['division'] = tagObj.division
+
+      tagArray.push(tagObjFmt)
+    }
+
+
+    mainWindow.send('display-tags', sortTags(tagArray))
   })
 
   ipcMain.on('get-tag-recipe-list', (event, tag) => {

@@ -100,7 +100,7 @@ class Editor {
     document.getElementById('save-content-btn').addEventListener('click', () => {
       const recTitle = document.getElementById('title').textContent
       const recipe =  this.getRecipeObj(recTitle)
-      ipcRenderer.send('save-recipe', recipe, this.loaded)
+      ipcRenderer.send('save-recipe', recipe)
       this.edited = false
     })
 
