@@ -82,14 +82,7 @@ class Editor {
 
     // Listener for title change
     const titleDOM = document.getElementById('title')
-
-    // We apparently need a named function for this...
-    // FIXME still does not get removed?
-    var titleInputHandler = function(evt) {
-      this.edited = true
-    }
-
-    titleDOM.addEventListener('input', titleInputHandler)
+    titleDOM.addEventListener('input', () => {this.edited=true})
   }
 
   /**
@@ -98,9 +91,9 @@ class Editor {
   constructButtonListeners() {
     // Save button
     document.getElementById('save-content-btn').addEventListener('click', () => {
-      const recTitle = document.getElementById('title').textContent
-      const recipe =  this.getRecipeObj(recTitle)
-      ipcRenderer.send('save-recipe', recipe)
+      const recipeTitle = document.getElementById('title').textContent
+      const recipe =  this.getRecipeObj(recipeTitle)
+      ipcRenderer.send('save-recipe', recipeTitle, recipe)
       this.edited = false
     })
 

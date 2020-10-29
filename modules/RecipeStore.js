@@ -5,7 +5,7 @@ class RecipeStore extends Store {
     super(settings)
 
     // initialize with todos or empty array
-    this.recipes = this.get('recipes') || []
+    this.recipes = this.get('recipes') || {}
   }
 
   saveRecipes () {
@@ -16,22 +16,16 @@ class RecipeStore extends Store {
     return this
   }
 
-  getRecipe (title) {
-    for(var i = 0; i < this.recipes.length; i++) {
-      const rec_i = this.recipes[i]
-      if (rec_i['title'] == title) {
-        return(rec_i)
-      }
-    }
+  size() {
+    return Object.keys(this.recipes).length
   }
 
   getRecipes () {
-    // set object's todos to todos in JSON file
-    this.recipes = this.get('recipes') || []
+    this.recipes = this.get('recipes') || {}
     return this
   }
 
-  addRecipe (recipe) {
+  addRecipe (recipeTitle, recipe) {
     // TODO just wanted get this going, but many opportunities to clean this up
     // --- First, it assumes there cannot be duplicated keys, it will just write over
     // --- data of a recipe with the same title...should probably throw a warning or something
@@ -39,42 +33,40 @@ class RecipeStore extends Store {
 
     // check if recipe key is already in recipes...
     // if so just overwrite the recipe indicated by the key
-    if (this.recipes.length == 0) {
+    if (this.size() == 0) {
       recipe['dateCreated'] = Date.now()
-      this.recipes = [ ...this.recipes, recipe ]
+      this.recipes[recipeTitle] = recipe
     } else {
-
       var update = false
-      for(var i=0; i < this.recipes.length; i++) {
-        // the recipe exists! simply update the delta and tags property
-        if(this.recipes[i]['title'] == recipe['title']) {
+
+      for(const [recipeTitle_i, recipe_i] of Object.entries(this.recipes)) {
+        if(recipeTitle_i == recipeTitle) {
           update = true
-          this.recipes[i]['delta'] = recipe['delta']
-          this.recipes[i]['tags'] = recipe['tags']
-          this.recipes[i]['dateLastModified'] = Date.now()
+          this.recipes[recipeTitle_i]['delta'] = recipe['delta']
+          this.recipes[recipeTitle_i]['tags']  = recipe['tags']
+          this.recipes[recipeTitle_i]['dateLastModified'] = Date.now()
         }
       }
 
       if(!update) {
         // no duplicate recipe found, append to the list
         recipe['dateCreated'] = Date.now()
-        this.recipes = [...this.recipes, recipe]
+        this.recipes[recipeTitle] = recipe
       }
     }
     return this.saveRecipes()
   }
 
-  deleteRecipe (title) {
-    // filter out the target todo
-    this.recipes = this.recipes.filter(t => t['title'] !== title)
+  modifyRecipe (recipe, oldRecipeTitle) {
+  }
 
+  deleteRecipe (recipeTitle) {
+    delete this.recipe[recipeTitle]
     return this.saveRecipes()
   }
 
   parseTitles () {
-    // get the the display titles of the recipes
-    const titles = this.recipes.map(recipe => {return recipe['title']})
-    return titles
+    return Object.keys(this.recipes)
   }
 
 }

@@ -78,21 +78,17 @@ class NavBar {
         el.style.fontWeight='normal'
       }
     })
-
-    // Highlight (i.e. embolden) the recipe text in this element??
-    //evt.target.style.fontWeight='bold'
   }
 
   /**
    * Used in the callback to display the clicked recipe in the navBar.
    * @param {object} evt The event emitted from the callback.
    */
-  displayRecipe(evt, navBarContents, loaded) {
+  displayRecipe(evt) {
     const title = evt.target.textContent
 
     // Attempt to load the recipe
     ipcRenderer.send('attempt-load-recipe', title)
-
   }
 
   /**

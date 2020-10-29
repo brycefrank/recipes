@@ -10,15 +10,16 @@ class SearchIndex {
       this.addField('text')
     })
 
-    recipeStore.recipes.forEach(recipe => {
+    Object.entries(recipeStore.recipes).forEach(entry => {
       // TODO a little clunky, it seems that the Delta object
       // is lost when we write it to electron-store, so we have
       // to convert it back to a Delta, would be nice to eliminate this
       // ... if anything electron-store is temporary so we'll wait on that
+      const [recipeTitle, recipe] = entry
       const delta = new Delta(recipe['delta'])
 
       this.index.addDoc({
-        'title': recipe['title'],
+        'title': recipeTitle,
         'text': toPlaintext(delta)
       })
     })

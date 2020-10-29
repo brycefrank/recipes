@@ -1,5 +1,5 @@
 const path = require('path')
-const { app, dialog, ipcMain, Menu, MenuItem } = require('electron')
+const { app, dialog, ipcMain } = require('electron')
 const env = process.env.NODE_ENV || 'development';
 const Window = require('./modules/Window')
 const RecipeStore = require('./modules/RecipeStore');
@@ -52,20 +52,22 @@ const sortTags = (tags) => {
   return(outTags)
 }
 
-function selectRecipe(window, recipe, sort_tags = true) {
+function selectRecipe(window, recipeTitle, sort_tags = true) {
+  const recipe = recipesData.recipes[recipeTitle]
   var recipeTags = recipe['tags']
 
   if(sort_tags) {
     recipeTags = sortTags(recipe.tags)
   }
 
-  settingsData.setSelectedRecipe(recipe['title'])
-  window.send('load-recipe', recipe['delta'], recipeTags, recipe['title']) 
-  window.send('highlight-recipe', recipe['title']) 
+  settingsData.setSelectedRecipe(recipeTitle)
+  window.send('load-recipe', recipe['delta'], recipeTags, recipeTitle) 
+  window.send('highlight-recipe', recipeTitle) 
 }
 
-function saveRecipe(recipe) {
-  recpiesData = recipesData.addRecipe(recipe)
+// TODO this is a little redundant, maybe remove and put it back in the save-recipe event
+function saveRecipe(recipeTitle, recipe) {
+  recpiesData = recipesData.addRecipe(recipeTitle, recipe)
   const titles = recipesData.getRecipes().parseTitles()
 
   // Update the tagsData
@@ -77,19 +79,34 @@ function main () {
     file: path.join('renderer', 'index.html')
   })
 
+  //convertOldRecipes()
+
   mainWindow.webContents.openDevTools()
 
   // Once the main window is displayed, send the list of recipes to
   // the renderer
   mainWindow.once('show', () => {
-    const recipeList = recipesData.getRecipes().parseTitles()
+    if(recipesData.size() == 0) {
+      // No recipe exists, add the template to recipeStore and select
+      newRecipe = {
+        delta: '',
+        tags: []
+      }
 
-    // TODO what if there are no recipes?
-    mainWindow.send('display-recipe-list', recipeList)
+      recipesData.addRecipe('New Recipe', newRecipe)
+      selectRecipe(mainWindow, 'New Recipe')
 
-    const lastRecipe = recipesData.getRecipe(settingsData.getSelectedRecipeTitle())
-    selectRecipe(mainWindow, lastRecipe)
-    tagsData.organizeTags(recipesData.recipes)
+    } else {
+      const recipeList = recipesData.parseTitles()
+
+      // TODO what if there are no recipes?
+      mainWindow.send('display-recipe-list', recipeList)
+
+      // TODO reimplement last selected recipe
+      const lastRecipeTitle = recipesData.parseTitles()[0]
+      selectRecipe(mainWindow, lastRecipeTitle)
+      tagsData.organizeTags(recipesData.recipes)
+    }
   })
 
   ipcMain.on('delete-recipe', (event, title) => {
@@ -103,15 +120,16 @@ function main () {
         recipesData = recipesData.deleteRecipe(title)    
 
         // Load the first recipe
-        const first_recipe = recipesData.recipes[0]
+        const firstRecipeTitle = recipesData.parseTitles()[0]
         // FIXME what if there are no recipes?
-        selectRecipe(mainWindow, first_recipe)
+        selectRecipe(mainWindow, firstRecipeTitle)
       }
     })
   })
 
-  ipcMain.on('save-recipe', (evt, recipe) => {
-    saveRecipe(recipe)
+  ipcMain.on('save-recipe', (evt, recipeTitle, recipe) => {
+    // TODO this is where we can add parts for modifying vs. saving recipes
+    saveRecipe(recipeTitle, recipe)
   });
 
   ipcMain.on('attempt-load-recipe', (evt, recipeTitle) => {
@@ -129,12 +147,9 @@ function main () {
       const index = returnVal.response
       if        (index == 0) { // Save and continue
         saveRecipe(currentRecipe)
-
-        const newRecipe = recipesData.getRecipe(newRecipeTitle)
-        selectRecipe(mainWindow, newRecipe)
+        selectRecipe(mainWindow, newRecipeTitle)
       } else if (index == 1) { // Proceed without Saving
-        const newRecipe = recipesData.getRecipe(newRecipeTitle)
-        selectRecipe(mainWindow, newRecipe)
+        selectRecipe(mainWindow, newRecipeTitle)
       }
     })
   })
@@ -142,8 +157,7 @@ function main () {
   ipcMain.on('load-recipe', (evt, recipeTitle, loaded) => {
     // When a recipe is loaded we render the delta in the editor,
     // update the title bar, and highlight the selected recipe in the navbar
-    const recipe = recipesData.getRecipe(recipeTitle)
-    selectRecipe(mainWindow, recipe)
+    selectRecipe(mainWindow, recipeTitle)
   })
 
   ipcMain.on('get-recipe-titles', (event) => {
@@ -210,6 +224,10 @@ app.on('window-all-closed', function () {
   //} else {
   //    console.log("This file doesn't exist, cannot delete");
   //}
+
+  // Reset all the recipes data
+  //recipesData.recipes = {}
+  //recipesData.saveRecipes()
 
   app.quit()
 })

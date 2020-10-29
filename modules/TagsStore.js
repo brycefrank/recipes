@@ -23,10 +23,11 @@ class TagsStore extends Store {
     this.tags = {}
 
     // FIXME if tags is empty, this crashes
-    for(var i = 0; i < recipes.length; i++) {
-      if(recipes[i]['tags'].length > 0) {
-        const rec_i_tags = recipes[i]['tags']
-        const rec_title = recipes[i]['title']
+    //for(var i = 0; i < recipes.length; i++) {
+    for(const [recipeTitle_i, recipe_i] of Object.entries(recipes)) {
+      if(recipe_i.tags.length > 0) {
+        const rec_i_tags = recipe_i.tags
+        const rec_title = recipeTitle_i
 
         for(var j = 0; j < rec_i_tags.length; j++) {
           const tag_name = [rec_i_tags[j]['value']]
