@@ -1,4 +1,3 @@
-const { ipcRenderer } = require('electron')
 const Split = require('split.js')
 
 /**

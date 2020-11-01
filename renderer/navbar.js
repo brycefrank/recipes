@@ -1,3 +1,5 @@
+const { ipcRenderer } = require("electron")
+
 /**
  * Implements the navigation bar, the left-most menu system
  */
@@ -30,6 +32,21 @@ class NavBar {
     ipcRenderer.on('highlight-recipe', (evt, recipeTitle) => {
       this.highlightRecipe(recipeTitle)
     })
+
+    ipcRenderer.on('refresh-navbar', (evt, recipeTitle) => {
+      switch (this.loaded) {
+        case 'recipes':
+          ipcRenderer.send('get-recipe-titles')
+          this.highlightRecipe(recipeTitle)
+          break;
+        case 'tags':
+          console.log('b')
+          break;
+        case 'search':
+          console.log('c')
+          break;
+      }
+    })
   }
 
   /**
@@ -60,6 +77,10 @@ class NavBar {
         this.loaded = 'search'
         this.displaySearch() // this doesn't need interaction with main
       }
+    })
+
+    document.getElementById('add-btn').addEventListener('click', () => {
+      ipcRenderer.send('new-recipe')
     })
   }
 

@@ -61,7 +61,7 @@ class RecipeStore extends Store {
   }
 
   deleteRecipe (recipeTitle) {
-    delete this.recipe[recipeTitle]
+    delete this.recipes[recipeTitle]
     return this.saveRecipes()
   }
 

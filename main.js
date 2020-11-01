@@ -1,5 +1,5 @@
 const path = require('path')
-const { app, dialog, ipcMain } = require('electron')
+const { app, dialog, ipcMain, screen } = require('electron')
 const env = process.env.NODE_ENV || 'development';
 const Window = require('./modules/Window')
 const RecipeStore = require('./modules/RecipeStore');
@@ -61,8 +61,10 @@ function selectRecipe(window, recipeTitle, sort_tags = true) {
   }
 
   settingsData.setSelectedRecipe(recipeTitle)
-  window.send('load-recipe', recipe['delta'], recipeTags, recipeTitle) 
-  window.send('highlight-recipe', recipeTitle) 
+  window.send('load-recipe', recipe['delta'], recipeTags, recipeTitle)
+
+  // Refresh the navbar with the new recipeTitle attached
+  window.send('refresh-navbar', recipeTitle) 
 }
 
 // TODO this is a little redundant, maybe remove and put it back in the save-recipe event
@@ -75,17 +77,23 @@ function saveRecipe(recipeTitle, recipe) {
 }
 
 function main () {
-  let mainWindow = new Window({
-    file: path.join('renderer', 'index.html')
+  // Specific to me, this sets up loading on an external monitor
+  const displays = screen.getAllDisplays()
+  const externalDisplay = displays.find((display) => {
+    return display.bounds.x !== 0 || display.bounds.y !== 0
   })
 
-  //convertOldRecipes()
+  let mainWindow = new Window({
+    file: path.join('renderer', 'index.html'),
+    x: externalDisplay.bounds.x + 50,
+    y: externalDisplay.bounds.y + 50,
+  })
 
   mainWindow.webContents.openDevTools()
 
   // Once the main window is displayed, send the list of recipes to
   // the renderer
-  mainWindow.once('show', () => {
+  mainWindow.on('ready-to-show', () => {
     if(recipesData.size() == 0) {
       // No recipe exists, add the template to recipeStore and select
       newRecipe = {
@@ -109,7 +117,7 @@ function main () {
     }
   })
 
-  ipcMain.on('delete-recipe', (event, title) => {
+  ipcMain.on('delete-recipe', (event, recipeTitle) => {
     const options = {
       buttons: ['Yes', 'No', 'Cancel'],
       message: 'Do you really want to delete?'
@@ -117,7 +125,8 @@ function main () {
 
     dialog.showMessageBox(options).then((data) => {
       if(data.response == 0) {
-        recipesData = recipesData.deleteRecipe(title)    
+        recipesData = recipesData.deleteRecipe(recipeTitle)    
+        mainWindow.send('recipe-deleted', recipeTitle)
 
         // Load the first recipe
         const firstRecipeTitle = recipesData.parseTitles()[0]
@@ -158,6 +167,17 @@ function main () {
     // When a recipe is loaded we render the delta in the editor,
     // update the title bar, and highlight the selected recipe in the navbar
     selectRecipe(mainWindow, recipeTitle)
+  })
+
+  ipcMain.on('new-recipe', (evt) => {
+    // TODO create a new recipe template
+    newRecipe = {
+      delta: '',
+      tags: []
+    }
+
+    recipesData.addRecipe('New Recipe', newRecipe)
+    selectRecipe(mainWindow, 'New Recipe')
   })
 
   ipcMain.on('get-recipe-titles', (event) => {

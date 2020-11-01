@@ -14,8 +14,7 @@
     "electron": "^10.1.2",
     "electron-builder": "^22.8.1",
     "electron-log": "^4.2.4",
-    "electron-reload": "^1.5.0",
-    "electron-reloader": "^1.0.1"
+    "electron-reload": "^1.5.0"
   },
   "dependencies": {
     "@yaireo/dragsort": "^1.0.8",
