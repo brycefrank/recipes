@@ -108,7 +108,7 @@ function main () {
       const recipeList = recipesData.parseTitles()
 
       // TODO what if there are no recipes?
-      mainWindow.send('display-recipe-list', recipeList)
+      mainWindow.send('display-recipe-list',recipeList)
 
       // TODO reimplement last selected recipe
       const lastRecipeTitle = recipesData.parseTitles()[0]
@@ -139,6 +139,7 @@ function main () {
   ipcMain.on('save-recipe', (evt, recipeTitle, recipe) => {
     // TODO this is where we can add parts for modifying vs. saving recipes
     saveRecipe(recipeTitle, recipe)
+    selectRecipe(mainWindow, recipeTitle)
   });
 
   ipcMain.on('attempt-load-recipe', (evt, recipeTitle) => {
@@ -183,6 +184,12 @@ function main () {
   ipcMain.on('get-recipe-titles', (event) => {
     const titles = recipesData.getRecipes().parseTitles()
     mainWindow.send('display-recipe-list', titles)
+  })
+
+  ipcMain.handle('get-recipe-titles', async (evt, arg) => {
+    const titles = recipesData.getRecipes().parseTitles()
+    await mainWindow.send('display-recipe-list', titles)
+    return 1
   })
 
   ipcMain.on('update-search', (event, query) => {

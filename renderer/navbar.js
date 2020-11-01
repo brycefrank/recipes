@@ -36,8 +36,16 @@ class NavBar {
     ipcRenderer.on('refresh-navbar', (evt, recipeTitle) => {
       switch (this.loaded) {
         case 'recipes':
-          ipcRenderer.send('get-recipe-titles')
-          this.highlightRecipe(recipeTitle)
+          // FIXME .send is asynchronous, so sometimes the 
+          // highlightRecipe goes first...see if there is an easy
+          // way to fix this within this file
+          //ipcRenderer.send('get-recipe-titles')
+          const test = async () => {
+            ipcRenderer.invoke('get-recipe-titles').then((val)=>{
+              this.highlightRecipe(recipeTitle)
+            })
+          }
+          test()
           break;
         case 'tags':
           console.log('b')
