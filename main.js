@@ -64,13 +64,13 @@ function selectRecipe(window, recipeTitle, sort_tags = true) {
   window.send('load-recipe', recipe['delta'], recipeTags, recipeTitle)
 
   // Refresh the navbar with the new recipeTitle attached
-  window.send('refresh-navbar', recipeTitle) 
+  const recipeList = recipesData.getRecipes().parseTitles()
+  window.send('refresh-navbar', recipeTitle, recipeList) 
 }
 
 // TODO this is a little redundant, maybe remove and put it back in the save-recipe event
 function saveRecipe(recipeTitle, recipe) {
   recpiesData = recipesData.addRecipe(recipeTitle, recipe)
-  const titles = recipesData.getRecipes().parseTitles()
 
   // Update the tagsData
   tagsData.updateTags(recipe)
@@ -184,12 +184,6 @@ function main () {
   ipcMain.on('get-recipe-titles', (event) => {
     const titles = recipesData.getRecipes().parseTitles()
     mainWindow.send('display-recipe-list', titles)
-  })
-
-  ipcMain.handle('get-recipe-titles', async (evt, arg) => {
-    const titles = recipesData.getRecipes().parseTitles()
-    await mainWindow.send('display-recipe-list', titles)
-    return 1
   })
 
   ipcMain.on('update-search', (event, query) => {

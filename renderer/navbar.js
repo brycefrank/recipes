@@ -29,29 +29,14 @@ class NavBar {
       this.displaySearch()
     })
 
-    ipcRenderer.on('highlight-recipe', (evt, recipeTitle) => {
-      this.highlightRecipe(recipeTitle)
-    })
-
-    ipcRenderer.on('refresh-navbar', (evt, recipeTitle) => {
+    ipcRenderer.on('refresh-navbar', (evt, recipeTitle, recipeList) => {
       switch (this.loaded) {
         case 'recipes':
-          // FIXME .send is asynchronous, so sometimes the 
-          // highlightRecipe goes first...see if there is an easy
-          // way to fix this within this file
-          //ipcRenderer.send('get-recipe-titles')
-          const test = async () => {
-            ipcRenderer.invoke('get-recipe-titles').then((val)=>{
-              this.highlightRecipe(recipeTitle)
-            })
-          }
-          test()
+          this.displayRecipeList(recipeList, recipeTitle)
           break;
         case 'tags':
-          console.log('b')
           break;
         case 'search':
-          console.log('c')
           break;
       }
     })
@@ -93,23 +78,6 @@ class NavBar {
   }
 
   /**
-   * Highlights the recipe DOM elements that match the recipeTitle.
-   * @param {string} recipeTitle A string representing the title of the recipe to highlight.
-   */
-  highlightRecipe(recipeTitle) {
-    // TODO also need to do this for the tagContext...
-    // "Dehighlight" any existing highlights
-    const recipeTitles = document.querySelectorAll('.recipe-title')
-    recipeTitles.forEach((el) => {
-      if(el.innerText == recipeTitle) {
-        el.style.fontWeight='bold'
-      } else {
-        el.style.fontWeight='normal'
-      }
-    })
-  }
-
-  /**
    * Used in the callback to display the clicked recipe in the navBar.
    * @param {object} evt The event emitted from the callback.
    */
@@ -124,7 +92,7 @@ class NavBar {
    * Displays the recipeList, adds click event listener to each element.
    * @param {string[]} recipeList An array containing all recipes in the data.
    */
-  displayRecipeList(recipeList) {
+  displayRecipeList(recipeList, highlightTitle) {
     var recipeListDiv = navbar.getElementsByClassName('recipe-list')[0]
 
     // If titles div does not exist, make it
@@ -138,7 +106,11 @@ class NavBar {
 
     // Create html string
     const titlesHTML = recipeList.reduce((html, title) => {
-      html += `<li class = 'recipe-title'>${title}</li>`
+      if(title != highlightTitle) {
+        html += `<li class = 'recipe-title'>${title}</li>`
+      } else {
+        html += `<li class = 'recipe-title'><b>${title}</b></li>`
+      }
       return html
     }, '')
 
