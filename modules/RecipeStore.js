@@ -45,6 +45,7 @@ class RecipeStore extends Store {
           this.recipes[recipeTitle_i]['delta'] = recipe['delta']
           this.recipes[recipeTitle_i]['tags']  = recipe['tags']
           this.recipes[recipeTitle_i]['makeLater']  = recipe['makeLater']
+          this.recipes[recipeTitle_i]['tried']  = recipe['tried']
           this.recipes[recipeTitle_i]['dateLastModified'] = Date.now()
         }
       }

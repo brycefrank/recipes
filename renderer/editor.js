@@ -22,6 +22,7 @@ class Editor {
     this.edited = false
     this.currentRecipeTitle = ''
     this.makeLater = false
+    this.tried = false
 
     ipcRenderer.on('attempt-load-recipe', (evt, newRecipeTitle) => {
       if(newRecipeTitle != this.currentRecipeTitle) {
@@ -103,6 +104,18 @@ class Editor {
         this.makeLater = false
       }
     })
+
+    // Listener for Tried 'n' True button
+    const tried = document.getElementById('tried-box')
+    tried.addEventListener('change', (evt) => {
+      const checked = evt.srcElement.checked
+      this.edited = true
+      if(checked) {
+        this.tried = true
+      } else {
+        this.tried = false
+      }
+    })
   }
 
   /**
@@ -140,7 +153,8 @@ class Editor {
       'title': recTitle,
       'tags': [],
       'delta': this.qEditor.getContents(),
-      'makeLater': this.makeLater
+      'makeLater': this.makeLater,
+      'tried': this.tried
     }
 
     for(var i=0; i < tagDOMs.length; i++) {

@@ -124,6 +124,7 @@ body{
 }
 
 #auxiliary-buttons{
+  display: flex;
   margin-left: auto;
 }
 
