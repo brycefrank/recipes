@@ -35,8 +35,11 @@ class NavBar {
           this.displayRecipeList(recipeList, recipeTitle)
           break;
         case 'tags':
+          ipcRenderer.send('get-tags-nav')
           break;
         case 'search':
+          // TODO Not sure if search really needs anything after save
+          // maybe just reset the search completely?
           break;
       }
     })

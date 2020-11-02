@@ -21,6 +21,7 @@ class Editor {
 
     this.edited = false
     this.currentRecipeTitle = ''
+    this.makeLater = false
 
     ipcRenderer.on('attempt-load-recipe', (evt, newRecipeTitle) => {
       if(newRecipeTitle != this.currentRecipeTitle) {
@@ -52,7 +53,7 @@ class Editor {
       title_html.innerHTML = `<h1>${title}</h1>`
 
       this.currentRecipeTitle = title
-      this.edited=false
+      this.edited = false
     })
   }
 
@@ -83,6 +84,17 @@ class Editor {
     // Listener for title change
     const titleDOM = document.getElementById('title')
     titleDOM.addEventListener('input', () => {this.edited=true})
+
+    // Listener for Make Later button
+    const makeLater = document.getElementById('make-later-box')
+    makeLater.addEventListener('change', (evt) => {
+      const checked = evt.srcElement.checked
+      if(checked) {
+        this.makeLater = true
+      } else {
+        this.makeLater = false
+      }
+    })
   }
 
   /**
@@ -119,7 +131,8 @@ class Editor {
     var recipe = {
       'title': recTitle,
       'tags': [],
-      'delta': this.qEditor.getContents()
+      'delta': this.qEditor.getContents(),
+      'makeLater': this.makeLater
     }
 
     for(var i=0; i < tagDOMs.length; i++) {

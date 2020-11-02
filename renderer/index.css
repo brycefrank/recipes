@@ -80,7 +80,6 @@ body{
   --tag-bg: #ffebf4;
 }
 
-
 #editor-frame{
   display: flex;
   flex-direction: column;
@@ -99,6 +98,8 @@ body{
 
 #editor-footer{
   flex: 0 1 auto;
+  display: flex;
+  direction: row;
 }
 
 .ql-toolbar.ql-snow{
@@ -115,9 +116,15 @@ body{
 
 #editor-buttons{
   flex: 0 1 40px;
+  display: flex;
+  direction: row;
   justify-content: left;
   margin-left: 5px;
   margin-bottom: 5px;
+}
+
+#auxiliary-buttons{
+  margin-left: auto;
 }
 
 #close-tag-context-button {
