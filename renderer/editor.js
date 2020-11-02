@@ -37,7 +37,7 @@ class Editor {
       }
     })
 
-    ipcRenderer.on('load-recipe', (evt, delta, tags, title) => {
+    ipcRenderer.on('load-recipe', (evt, delta, tags, title, makeLater) => {
       this.qEditor.setText('') // doing this is quicker than just doing the delta
       this.qEditor.setContents(delta)
 
@@ -51,6 +51,13 @@ class Editor {
 
       const title_html = document.getElementById('title')
       title_html.innerHTML = `<h1>${title}</h1>`
+
+      const makeLaterBox = document.getElementById('make-later-box')
+      if(makeLater) {
+        makeLaterBox.checked = true
+      } else {
+        makeLaterBox.checked = false
+      }
 
       this.currentRecipeTitle = title
       this.edited = false

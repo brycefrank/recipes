@@ -61,7 +61,7 @@ function selectRecipe(window, recipeTitle, sort_tags = true) {
   }
 
   settingsData.setSelectedRecipe(recipeTitle)
-  window.send('load-recipe', recipe['delta'], recipeTags, recipeTitle)
+  window.send('load-recipe', recipe['delta'], recipeTags, recipeTitle, recipe['makeLater'])
 
   // Refresh the navbar with the new recipeTitle attached
   const recipeList = recipesData.getRecipes().parseTitles()
