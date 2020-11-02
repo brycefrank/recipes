@@ -156,7 +156,7 @@ function main () {
     res.then((returnVal) => {
       const index = returnVal.response
       if        (index == 0) { // Save and continue
-        saveRecipe(currentRecipe)
+        saveRecipe(currentRecipe.title, currentRecipe)
         selectRecipe(mainWindow, newRecipeTitle)
       } else if (index == 1) { // Proceed without Saving
         selectRecipe(mainWindow, newRecipeTitle)

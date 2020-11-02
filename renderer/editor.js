@@ -96,6 +96,7 @@ class Editor {
     const makeLater = document.getElementById('make-later-box')
     makeLater.addEventListener('change', (evt) => {
       const checked = evt.srcElement.checked
+      this.edited = true
       if(checked) {
         this.makeLater = true
       } else {
