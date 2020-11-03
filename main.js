@@ -61,7 +61,8 @@ function selectRecipe(window, recipeTitle, sort_tags = true) {
   }
 
   settingsData.setSelectedRecipe(recipeTitle)
-  window.send('load-recipe', recipe['delta'], recipeTags, recipeTitle, recipe['makeLater'])
+  // FIXME why not just pass the whole recipe?
+  window.send('load-recipe', recipe['delta'], recipeTags, recipeTitle, recipe['makeSoon'], recipe['triedNTrue'])
 
   // Refresh the navbar with the new recipeTitle attached
   const recipeList = recipesData.getRecipes().parseTitles()
@@ -215,8 +216,6 @@ function main () {
 
       tagArray.push(tagObjFmt)
     }
-
-
     mainWindow.send('display-tags', sortTags(tagArray))
   })
 
@@ -227,6 +226,13 @@ function main () {
   ipcMain.on('set-tag-division', (event, tagName, division) => {
     tagsData.setTagDivision(tagName, division)
     mainWindow.send('update-tag-division')
+  })
+
+  ipcMain.on('get-filtered-recipe-list', (evt, type, filter) => {
+    // type is either 'triedNTrue' or 'makeSoon'
+    // filter is either 'yes' 'no' or 'all'
+    const filtered = recipesData.getFilteredList(type, filter)
+    mainWindow.send('display-recipe-list', filtered)
   })
 
 }

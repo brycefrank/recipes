@@ -21,8 +21,8 @@ class Editor {
 
     this.edited = false
     this.currentRecipeTitle = ''
-    this.makeLater = false
-    this.tried = false
+    this.makeSoon = false
+    this.triedNTrue = false
 
     ipcRenderer.on('attempt-load-recipe', (evt, newRecipeTitle) => {
       if(newRecipeTitle != this.currentRecipeTitle) {
@@ -38,9 +38,10 @@ class Editor {
       }
     })
 
-    ipcRenderer.on('load-recipe', (evt, delta, tags, title, makeLater) => {
+    ipcRenderer.on('load-recipe', (evt, delta, tags, title, makeSoon, triedNTrue) => {
       this.qEditor.setText('') // doing this is quicker than just doing the delta
       this.qEditor.setContents(delta)
+      console.log(triedNTrue)
 
       // Remove the tags
       this.tagInput.removeAllTags()
@@ -53,12 +54,22 @@ class Editor {
       const title_html = document.getElementById('title')
       title_html.innerHTML = `<h1>${title}</h1>`
 
-      const makeLaterBox = document.getElementById('make-later-box')
-      if(makeLater) {
-        makeLaterBox.checked = true
+      this.makeSoon = makeSoon
+      const makeSoonBox = document.getElementById('make-soon-box')
+      if(makeSoon) {
+        makeSoonBox.checked = true
       } else {
-        makeLaterBox.checked = false
+        makeSoonBox.checked = false
       }
+
+      this.triedNTrue = triedNTrue
+      const triedBox = document.getElementById('tried-box')
+      if(triedNTrue) {
+        triedBox.checked = true
+      } else {
+        triedBox.checked = false
+      }
+
 
       this.currentRecipeTitle = title
       this.edited = false
@@ -93,15 +104,15 @@ class Editor {
     const titleDOM = document.getElementById('title')
     titleDOM.addEventListener('input', () => {this.edited=true})
 
-    // Listener for Make Later button
-    const makeLater = document.getElementById('make-later-box')
-    makeLater.addEventListener('change', (evt) => {
+    // Listener for make-soon button
+    const makeSoon = document.getElementById('make-soon-box')
+    makeSoon.addEventListener('change', (evt) => {
       const checked = evt.srcElement.checked
       this.edited = true
       if(checked) {
-        this.makeLater = true
+        this.makeSoon = true
       } else {
-        this.makeLater = false
+        this.makeSoon = false
       }
     })
 
@@ -111,9 +122,9 @@ class Editor {
       const checked = evt.srcElement.checked
       this.edited = true
       if(checked) {
-        this.tried = true
+        this.triedNTrue = true
       } else {
-        this.tried = false
+        this.triedNTrue = false
       }
     })
   }
@@ -153,8 +164,8 @@ class Editor {
       'title': recTitle,
       'tags': [],
       'delta': this.qEditor.getContents(),
-      'makeLater': this.makeLater,
-      'tried': this.tried
+      'makeSoon': this.makeSoon,
+      'triedNTrue': this.triedNTrue
     }
 
     for(var i=0; i < tagDOMs.length; i++) {

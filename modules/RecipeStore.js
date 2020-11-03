@@ -25,6 +25,26 @@ class RecipeStore extends Store {
     return this
   }
 
+  getFilteredList(type, filter) {
+    var outTitles = []
+
+    for(const [key, value] of Object.entries(this.recipes)) {
+      // type = {'makeSoon', 'triedNTrue'}
+      // filter = {'yes', 'no' 'all'}
+      if(filter == 'yes') {
+        // We want the stored value to be true
+        if(value[type] == true) {outTitles.push(key)}
+      } else if (filter == 'no') {
+        if(value[type] == false) {outTitles.push(key)}
+      } else if(filter == 'all') {
+        outTitles = this.parseTitles()
+      } else {
+        // TODO throw error
+      }
+    }
+    return outTitles
+  }
+
   addRecipe (recipeTitle, recipe) {
     // TODO just wanted get this going, but many opportunities to clean this up
     // --- First, it assumes there cannot be duplicated keys, it will just write over
@@ -44,8 +64,8 @@ class RecipeStore extends Store {
           update = true
           this.recipes[recipeTitle_i]['delta'] = recipe['delta']
           this.recipes[recipeTitle_i]['tags']  = recipe['tags']
-          this.recipes[recipeTitle_i]['makeLater']  = recipe['makeLater']
-          this.recipes[recipeTitle_i]['tried']  = recipe['tried']
+          this.recipes[recipeTitle_i]['makeSoon']  = recipe['makeSoon']
+          this.recipes[recipeTitle_i]['triedNTrue']  = recipe['triedNTrue']
           this.recipes[recipeTitle_i]['dateLastModified'] = Date.now()
         }
       }

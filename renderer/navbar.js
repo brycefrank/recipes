@@ -9,6 +9,9 @@ class NavBar {
     this.navBarContents = document.getElementById('navbar-contents')
     this.constructButtonListeners()
 
+    this.selectedType = 'triedNTrue'
+    this.selectedFilter = 'all'
+
     // At this point the only splits are navbar and editor-frame
     Split(['#navbar', '#editor-frame'], {
       sizes: [25, 75]
@@ -91,20 +94,89 @@ class NavBar {
     ipcRenderer.send('attempt-load-recipe', title)
   }
 
+  constructTypeOpt() {
+    //---Drop down for tnt/ms--//
+    var dropDownDOM = document.createElement('div')
+
+    var selectDOM = document.createElement('select')
+    selectDOM.setAttribute('id', 'filter-dropdown')
+
+    const tntOpt = document.createElement('option')
+    tntOpt.setAttribute('value', 'triedNTrue')
+    tntOpt.innerText = "Tried 'n' True"
+
+    const msOpt = document.createElement('option')
+    msOpt.setAttribute('value', 'makeSoon')
+    msOpt.innerText = 'Make Soon'
+
+    selectDOM.appendChild(tntOpt)
+    selectDOM.appendChild(msOpt)
+
+    selectDOM.value = this.selectedType
+    selectDOM.addEventListener('change', (evt)=>{this.handleTypeDropdown(evt, this)})
+
+    dropDownDOM.appendChild(selectDOM)
+    return dropDownDOM
+  }
+
+  handleTypeDropdown(evt, editor) {
+    const selected = evt.target.value
+    if(editor.selectedType != selected) {
+      editor.selectedType = selected
+      ipcRenderer.send('get-filtered-recipe-list', selected, editor.selectedFilter)
+    }
+  }
+
+  constructFilterOpt() {
+    //---Drop down for yes/no/all--//
+    var dropDownDOM = document.createElement('div')
+
+    var selectDOM = document.createElement('select')
+    selectDOM.setAttribute('id', 'filter-dropdown')
+
+    const yesOpt = document.createElement('option')
+    yesOpt.setAttribute('value', 'yes')
+    yesOpt.innerText = "Yes"
+
+    const noOpt = document.createElement('option')
+    noOpt.setAttribute('value', 'no')
+    noOpt.innerText = 'No'
+
+    const allOpt = document.createElement('option')
+    allOpt.setAttribute('value', 'all')
+    allOpt.innerText = 'All'
+
+    selectDOM.appendChild(allOpt)
+    selectDOM.appendChild(yesOpt)
+    selectDOM.appendChild(noOpt)
+
+    selectDOM.value = this.selectedFilter
+    selectDOM.addEventListener('change', (evt) => {this.handleFilterDropdown(evt, this)})
+
+    dropDownDOM.appendChild(selectDOM)
+    return dropDownDOM
+  }
+
+  handleFilterDropdown(evt, editor) {
+    const selected = evt.target.value
+    if(editor.selectedFilter != selected) {
+      editor.selectedFilter = selected
+      ipcRenderer.send('get-filtered-recipe-list', editor.selectedType, selected)
+    }
+  }
+
   /**
    * Displays the recipeList, adds click event listener to each element.
    * @param {string[]} recipeList An array containing all recipes in the data.
    */
   displayRecipeList(recipeList, highlightTitle) {
     var recipeListDiv = navbar.getElementsByClassName('recipe-list')[0]
+    this.navBarContents.innerHTML = ''
 
     // If titles div does not exist, make it
     if(recipeListDiv == null) {
       recipeListDiv = document.createElement('ul')
       recipeListDiv.setAttribute('class', 'recipe-list')
-    } else {
-      // Otherwise clear its contents
-      recipeListDiv.innerHTML = ''
     }
 
     // Create html string
@@ -125,8 +197,15 @@ class NavBar {
         this.displayRecipe(evt, this.navBarContents, this.loaded)
       })
     })
-  }
 
+    // Add drop down menus for filtering
+    // TODO this could be cleaned up a bit
+    const typeOpt = this.constructTypeOpt()
+    this.navBarContents.appendChild(typeOpt)
+
+    const filterOpt = this.constructFilterOpt()
+    this.navBarContents.appendChild(filterOpt)
+  }
 
   /**
    * Function used in the callback when a tag is clicked in the navBar.
