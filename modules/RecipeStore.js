@@ -79,7 +79,11 @@ class RecipeStore extends Store {
     return this.saveRecipes()
   }
 
-  modifyRecipe (recipe, oldRecipeTitle) {
+  modifyRecipe (recipeTitle, recipe, oldRecipeTitle) {
+    // Delete the old recipe
+    this.deleteRecipe(oldRecipeTitle)
+    this.addRecipe(recipeTitle, recipe)
+    return this.saveRecipes()
   }
 
   deleteRecipe (recipeTitle) {

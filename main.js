@@ -69,11 +69,15 @@ function selectRecipe(window, recipeTitle, sort_tags = true) {
   window.send('refresh-navbar', recipeTitle, recipeList) 
 }
 
-// TODO this is a little redundant, maybe remove and put it back in the save-recipe event
-function saveRecipe(recipeTitle, recipe) {
-  recpiesData = recipesData.addRecipe(recipeTitle, recipe)
+function saveRecipe(recipeTitle, recipe, oldRecipeTitle) {
+  if(recipeTitle != oldRecipeTitle) {
+    recipesData = recipesData.modifyRecipe(recipeTitle, recipe, oldRecipeTitle)
+  } else {
+    recpiesData = recipesData.addRecipe(recipeTitle, recipe)
+  }
 
   // Update the tagsData
+  // TODO make sure this is sympatico with recipesData
   tagsData.updateTags(recipe)
 }
 
@@ -137,9 +141,9 @@ function main () {
     })
   })
 
-  ipcMain.on('save-recipe', (evt, recipeTitle, recipe) => {
+  ipcMain.on('save-recipe', (evt, recipeTitle, recipe, oldRecipeTitle) => {
     // TODO this is where we can add parts for modifying vs. saving recipes
-    saveRecipe(recipeTitle, recipe)
+    saveRecipe(recipeTitle, recipe, oldRecipeTitle)
     selectRecipe(mainWindow, recipeTitle)
   });
 
@@ -240,21 +244,35 @@ function main () {
 app.on('ready', main)
 
 app.on('window-all-closed', function () {
-  //if (fs.existsSync(dataPath)) {
-  //    fs.unlink(dataPath, (err) => {
-  //        if (err) {
-  //            console.log(err);
-  //            return;
-  //        }
-  //        console.log("File succesfully deleted");
-  //    });
-  //} else {
-  //    console.log("This file doesn't exist, cannot delete");
-  //}
+  const userDataPath = app.getPath('userData')
+  const backupsPath = path.join(userDataPath, 'backups')
 
-  // Reset all the recipes data
-  //recipesData.recipes = {}
-  //recipesData.saveRecipes()
+  if(!fs.existsSync(backupsPath)) {
+    fs.mkdirSync(backupsPath)
+  }
+
+  const date = new Date()
+  const day = date.getDay() + 1
+  const month = date.getMonth() + 1
+  const year = date.getFullYear()
+
+  const dirString = month + '_' + day + '_' + year
+  const datePath = path.join(backupsPath, dirString)
+
+  const getDirectories = backupsPath => 
+    fs.readdirSync(backupsPath, {withFileTypes: true})
+      .filter(dirent => dirent.isDirectory())
+      .map(dirent => dirent.name)
+
+  // Only backup if the directory for the day doesn't exist
+  // implies we backup once per day
+  if(!getDirectories(backupsPath).includes(dirString)) {
+    fs.mkdirSync(datePath)
+    fs.writeFileSync(path.join(datePath, 'RecipesMain.json'), JSON.stringify(recipesData.store))
+    fs.writeFileSync(path.join(datePath, 'TagsMain.json'), JSON.stringify(tagsData.store))
+    fs.writeFileSync(path.join(datePath, 'Settings.json'), JSON.stringify(settingsData.store))
+  }
+
 
   app.quit()
 })

@@ -41,7 +41,6 @@ class Editor {
     ipcRenderer.on('load-recipe', (evt, delta, tags, title, makeSoon, triedNTrue) => {
       this.qEditor.setText('') // doing this is quicker than just doing the delta
       this.qEditor.setContents(delta)
-      console.log(triedNTrue)
 
       // Remove the tags
       this.tagInput.removeAllTags()
@@ -137,7 +136,7 @@ class Editor {
     document.getElementById('save-content-btn').addEventListener('click', () => {
       const recipeTitle = document.getElementById('title').textContent
       const recipe =  this.getRecipeObj(recipeTitle)
-      ipcRenderer.send('save-recipe', recipeTitle, recipe)
+      ipcRenderer.send('save-recipe', recipeTitle, recipe, this.currentRecipeTitle)
       this.edited = false
     })
 

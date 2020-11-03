@@ -1,7 +1,7 @@
 {
   "name": "recipes",
   "version": "1.0.0",
-  "description": "Searchable recipes for Sara.",
+  "description": "Searchable and taggable recipes for Sara.",
   "main": "main.js",
   "scripts": {
     "start": "set NODE_ENV=development&&electron .",
