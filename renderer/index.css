@@ -39,6 +39,7 @@ body{
 #navbar-contents {
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
   overflow-y: auto;
 }
 
@@ -47,11 +48,14 @@ body{
   margin-top: 5px;
 }
 
+#dropdown-menus {
+  margin-top: auto;
+}
+
 #search-bar {
   margin: 0 auto;
   margin-top: 5px;
 }
-
 
 #title > h1 {
   margin-left: 5px;

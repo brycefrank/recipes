@@ -200,11 +200,17 @@ class NavBar {
 
     // Add drop down menus for filtering
     // TODO this could be cleaned up a bit
+
+    const dropdownDiv = document.createElement('div')
+    dropdownDiv.setAttribute('id', 'dropdown-menus')
+
     const typeOpt = this.constructTypeOpt()
-    this.navBarContents.appendChild(typeOpt)
+    dropdownDiv.appendChild(typeOpt)
 
     const filterOpt = this.constructFilterOpt()
-    this.navBarContents.appendChild(filterOpt)
+    dropdownDiv.appendChild(filterOpt)
+
+    this.navBarContents.appendChild(dropdownDiv)
   }
 
   /**
