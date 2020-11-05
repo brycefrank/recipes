@@ -170,8 +170,29 @@ class NavBar {
    * @param {string[]} recipeList An array containing all recipes in the data.
    */
   displayRecipeList(recipeList, highlightTitle) {
+    // TODO still not a fan, it seems like this could be broken into many smaller functions
     var recipeListDiv = navbar.getElementsByClassName('recipe-list')[0]
-    this.navBarContents.innerHTML = ''
+
+    if(this.loaded == 'recipes') {
+      this.navBarContents.innerHTML = ''
+      document.getElementById('navbar-footer').innerHTML = ''
+      document.getElementById('search-bar').innerHTML = ''
+
+      // Add drop down menus for filtering
+      // TODO this could be cleaned up a bit, moved to its own function
+      const dropdownDiv = document.createElement('div')
+      dropdownDiv.setAttribute('id', 'dropdown-menus')
+
+      const typeOpt = this.constructTypeOpt()
+      dropdownDiv.appendChild(typeOpt)
+
+      const filterOpt = this.constructFilterOpt()
+      dropdownDiv.appendChild(filterOpt)
+
+      document.getElementById('navbar-footer').appendChild(dropdownDiv)
+    } else if(this.loaded== 'search') {
+      this.navBarContents.innerHTML = ''
+    }
 
     // If titles div does not exist, make it
     if(recipeListDiv == null) {
@@ -197,20 +218,6 @@ class NavBar {
         this.displayRecipe(evt, this.navBarContents, this.loaded)
       })
     })
-
-    // Add drop down menus for filtering
-    // TODO this could be cleaned up a bit
-
-    const dropdownDiv = document.createElement('div')
-    dropdownDiv.setAttribute('id', 'dropdown-menus')
-
-    const typeOpt = this.constructTypeOpt()
-    dropdownDiv.appendChild(typeOpt)
-
-    const filterOpt = this.constructFilterOpt()
-    dropdownDiv.appendChild(filterOpt)
-
-    this.navBarContents.appendChild(dropdownDiv)
   }
 
   /**
@@ -245,6 +252,8 @@ class NavBar {
    */
   displayTags(tags) {
     this.navBarContents.innerHTML=''
+    document.getElementById('navbar-footer').innerHTML = ''
+    document.getElementById('search-bar').innerHTML = ''
 
     for(var i =0; i < tags.length; i++) {
       const tagTitle = tags[i].value
@@ -273,10 +282,17 @@ class NavBar {
    * Displays the search interface in the navBar.
    */
   displaySearch() {
-    this.navBarContents.innerHTML = `
-      <div id="search-bar">
-        <input type="text" id="search-input">
-      </div>`
+    this.navBarContents.innerHTML= ''
+    document.getElementById('navbar-footer').innerHTML = ''
+    document.getElementById('search-bar').innerHTML = '' // FIXME can this be deleted?
+
+    const inputDOM = document.createElement('input')
+    inputDOM.setAttribute('type', 'text')
+    inputDOM.setAttribute('id', 'search-input')
+
+    const tabDOM = document.getElementsByClassName('tab')[0]
+    //tabDOM.parentNode.insertBefore(searchBarDOM, tabDOM.nextSibling)
+    document.getElementById('search-bar').appendChild(inputDOM)
 
     document.getElementById('search-input').addEventListener('input', (e) => {
       const content = e.target.value
