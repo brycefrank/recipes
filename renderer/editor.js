@@ -52,7 +52,6 @@ class Editor {
 
       const title_html = document.getElementById('title')
       title_html.innerHTML = `<h1>${title}</h1>`
-
       this.makeSoon = makeSoon
       const makeSoonBox = document.getElementById('make-soon-box')
       if(makeSoon) {

@@ -89,9 +89,9 @@ function main () {
   })
 
   let mainWindow = new Window({
-    file: path.join('renderer', 'index.html'),
-    x: externalDisplay.bounds.x + 50,
-    y: externalDisplay.bounds.y + 50,
+    file: path.join('renderer', 'index.html')//,
+    //x: externalDisplay.bounds.x + 50,
+    //y: externalDisplay.bounds.y + 50,
   })
 
   mainWindow.webContents.openDevTools()
@@ -103,7 +103,9 @@ function main () {
       // No recipe exists, add the template to recipeStore and select
       newRecipe = {
         delta: '',
-        tags: []
+        tags: [],
+        makeSoon: false,
+        triedNTrue: false
       }
 
       recipesData.addRecipe('New Recipe', newRecipe)
@@ -179,7 +181,9 @@ function main () {
     // TODO create a new recipe template
     newRecipe = {
       delta: '',
-      tags: []
+      tags: [],
+      makeSoon: false,
+      triedNTrue: false
     }
 
     recipesData.addRecipe('New Recipe', newRecipe)
