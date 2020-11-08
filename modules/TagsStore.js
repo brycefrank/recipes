@@ -88,18 +88,15 @@ class TagsStore extends Store {
 
           if(!tagTitles.includes(ix_tag)) {
             // we want to DELETE ourselves from this.tags[ix_tag]
-            this.tags[ix_tag].recipes = this.tags[ix_tag].recipes.map((recTitle_i) => {
-              if(recTitle_i != recTitle) {
-              return(recTitle_i)
-            }})
+            this.tags[ix_tag].recipes = this.tags[ix_tag].recipes.filter((recTitle_i) => {
+              return recTitle_i != recTitle
+            })
 
-            // finally, if the recList is empty, delete the tag completely from this.tags
-            if(this.tags[ix_tag].recipes[0] == undefined) { delete this.tags[ix_tag] }
           }
         } else {
           // Otherwise the rec_title does NOT belong to the tag currently. Check if 
           // we should add it to thist.tags[ix_tag] (i.e. rec_tags contains ix_tag)
-          if(recTags.includes(ix_tag)) {
+          if(tagTitles.includes(ix_tag)) {
             this.tags[ix_tag].recipes.push(recTitle)
           }
         }

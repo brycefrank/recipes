@@ -94,7 +94,7 @@ function main () {
     //y: externalDisplay.bounds.y + 50,
   })
 
-  //mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   // Once the main window is displayed, send the list of recipes to
   // the renderer
